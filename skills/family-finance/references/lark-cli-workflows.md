@@ -59,6 +59,8 @@ Never write without a `WritePreview`.
 6. Re-read written ranges and verify values.
 7. Log success or partial failure.
 
+Run Feishu write operations serially. Do not dispatch multiple `lark-cli sheets +write` calls in parallel; Feishu may return `90217 too many request`. If this happens, re-read target ranges, identify which ranges were actually written, wait briefly, then continue with a fresh preview or a carefully scoped compensating write.
+
 Example write:
 
 ```bash

@@ -1,0 +1,17 @@
+# Local family-finance runtime state
+.family-finance/
+.family-finance-profiles/
+.family-finance-recovery/
+*.family-finance.local.json
+*.family-finance.recovery.json
+
+# Local generated exports and scratch output
+exports/
+tmp/
+
+# Node dependencies
+node_modules/
+
+# Worktree scratch space
+.worktrees/
+worktrees/
