@@ -183,7 +183,7 @@
       "W3:AC18"
     ],
     "balance": [
-      "B18:M19",
+      "C13:M14",
       "H2:H17"
     ]
   },
@@ -643,7 +643,7 @@
           "=SUM(N3:N14)",
           null,
           "收支结余",
-          "=B16-H16",
+          "=SUM(Q3:Q14)",
           null,
           null,
           null,
@@ -670,7 +670,7 @@
           null,
           null,
           "现金结余",
-          "=Q16-M17",
+          "=SUM(S3:S14)",
           null,
           null,
           null,
@@ -681,7 +681,7 @@
           null,
           null,
           "资产变化总计",
-          "=Q16+V17"
+          "=SUM(AB3:AB14)"
         ],
         [
           "收入说明",
@@ -754,7 +754,7 @@
           "防御层",
           null,
           null,
-          "=SUM(H3:H10)",
+          "=SUM(H3:H6)",
           0.4,
           null,
           "房产",
@@ -769,7 +769,7 @@
           "现金及短债",
           null,
           null,
-          "=DIVIDE(G3,G18)",
+          "=IFERROR(DIVIDE(G3,G13),0)",
           0.05,
           null,
           "车位/其他不动产",
@@ -784,7 +784,7 @@
           "公积金账户",
           null,
           null,
-          "=DIVIDE(G4,G18)",
+          "=IFERROR(DIVIDE(G4,G13),0)",
           null,
           null,
           "车辆资产",
@@ -799,7 +799,7 @@
           "实物黄金",
           null,
           null,
-          "=DIVIDE(G5,G18)",
+          "=IFERROR(DIVIDE(G5,G13),0)",
           0.15,
           null,
           "个人养老金账户A",
@@ -814,7 +814,7 @@
           "贷款备还金",
           null,
           null,
-          "=DIVIDE(G6,G18)",
+          "=IFERROR(DIVIDE(G6,G13),0)",
           0.2,
           null,
           "个人养老金账户B",
@@ -829,7 +829,7 @@
           "Beta层",
           null,
           null,
-          "=SUM(H12:H14)",
+          "=SUM(H8:H9)",
           0.4
         ],
         [
@@ -840,7 +840,7 @@
           "宽基基金账户",
           null,
           null,
-          "=DIVIDE(G12,G18)",
+          "=IFERROR(DIVIDE(G8,G13),0)",
           0.28
         ],
         [
@@ -851,7 +851,7 @@
           "海外指数账户",
           null,
           null,
-          "=DIVIDE(G13,G18)"
+          "=IFERROR(DIVIDE(G9,G13),0)"
         ],
         [
           null,
@@ -861,7 +861,7 @@
           "Alpha层",
           null,
           null,
-          "=SUM(H16:H17)",
+          "=SUM(H11:H12)",
           0.2
         ],
         [
@@ -872,7 +872,7 @@
           "个股/主动账户",
           null,
           null,
-          "=DIVIDE(G16,G18)",
+          "=IFERROR(DIVIDE(G11,G13),0)",
           0.2
         ],
         [
@@ -883,22 +883,22 @@
           "公司股权/RSU",
           null,
           null,
-          "=DIVIDE(G17,G18)"
+          "=IFERROR(DIVIDE(G12,G13),0)"
         ],
         [
           "负债总计",
-          "=SUM(C2:C17)",
           null,
+          "=SUM(C2:C12)",
           null,
           "流动资产总计",
-          "=SUM(F3:F17)",
-          "=SUM(G3:G17)",
+          "=SUM(F3:F12)",
+          "=SUM(G3:G12)",
           null,
           null,
           null,
           "固定资产总计",
-          "=SUM(L2:L17)",
-          "=SUM(M2:M17)"
+          "=SUM(L2:L12)",
+          "=SUM(M2:M12)"
         ],
         [
           null,
@@ -912,7 +912,7 @@
           null,
           null,
           "净资产",
-          "=-B18+G18+M18"
+          "=-C13+G13+M13"
         ]
       ],
       "merges": [],
