@@ -70,6 +70,7 @@ The manifest records:
 - Standard fields and their cell/column mappings.
 - User-writable regions.
 - Formula and summary regions that must not be overwritten.
+- Renderable seed definitions for reconstruction, including values, formulas, styles, merged ranges, frozen rows/columns, dimensions, dropdowns, and other supported sheet features needed by the local template.
 - Unit policy, defaulting to 万元.
 - Annual sheet group creation rules.
 - Config recovery fields.
@@ -83,6 +84,8 @@ The long-running ledger is one Feishu spreadsheet containing multiple annual she
 _config
 _snapshots
 _imports
+_template_cashflow
+_template_balance
 2026现金流
 2026资产负债
 2027现金流
@@ -93,6 +96,34 @@ _imports
 System sheets are visible, not hidden. Their first rows should warn users that these sheets are managed by the skill, can be inspected and carefully edited, and may break automation if schema versions, sheet IDs, field mappings, or formula regions are changed incorrectly.
 
 `_config` stores a copy of the local profile so a user can recover after losing local state. `_snapshots` stores optional balance sheet history. `_imports` stores import metadata, validation summaries, month ranges, and write outcomes without preserving unnecessary sensitive raw input.
+
+`_template_cashflow` and `_template_balance` are visible seed sheets used for annual rollover. They contain generalized labels, formulas, formatting, and no real user values. Annual sheets should be created by copying these seed sheets inside the same spreadsheet when possible, because `lark-cli sheets +copy-sheet` can operate within an existing spreadsheet. If seed copying fails or is unavailable, the implementation falls back to manifest-driven reconstruction with `+create-sheet`, `+write`, `+update-sheet`, `+merge-cells`, `+set-style`, and dimension commands.
+
+## Sheet Creation Protocol
+
+The first implementation must treat Feishu sheet creation as a tested protocol, not an assumption.
+
+Initial ledger creation uses this order:
+
+1. Create an empty Feishu spreadsheet with `lark-cli sheets +create`.
+2. Inspect the default sheet created with the new spreadsheet and either reuse it for the first system/seed sheet, rename it, or delete it after replacement. Do not leave an unmanaged default sheet.
+3. Create visible system and seed sheets with `lark-cli sheets +create-sheet`.
+4. Populate seed sheets from the local manifest using `lark-cli sheets +write`.
+5. Apply frozen rows/columns and sheet protection metadata with `lark-cli sheets +update-sheet`.
+6. Apply merged cells, styles, dimensions, and dropdowns with the corresponding `lark-cli sheets +*` commands where supported.
+7. Create the first annual sheet group by copying seed sheets with `lark-cli sheets +copy-sheet`.
+8. Populate `_config` after the annual sheet IDs are known.
+
+Annual rollover uses this order:
+
+1. Read `_config` and verify seed sheet IDs still exist.
+2. Copy `_template_cashflow` to `<year>现金流`.
+3. Copy `_template_balance` to `<year>资产负债`.
+4. Clear or initialize writable data ranges according to the manifest.
+5. Verify the copied sheets by reading formulas with `--value-render-option Formula`, checking sheet metadata with `lark-cli sheets +info`, and comparing required ranges, formulas, frozen rows/columns, and merge counts against the manifest.
+6. Update `_config` only after verification passes.
+
+If `+copy-sheet` cannot preserve required formulas or formatting, the implementation must switch that ledger to the manifest reconstruction path and record the degraded creation mode in `_config`. The degraded mode must still pass formula, writable-range, and protected-range checks before accepting writes.
 
 ## Local Profile
 
@@ -107,6 +138,8 @@ The main skill also stores a lightweight local profile. It must avoid storing fu
 
 If local state is missing, the user can provide a Feishu spreadsheet URL and the skill can rebuild the local profile from `_config`.
 
+Profile data is not a secret, but it is private. Never store Feishu access tokens, refresh tokens, app secrets, cookies, keychain material, or raw authentication output in either local profile files or `_config`. The profile may store document identifiers that are already implied by access to the ledger, such as spreadsheet token, spreadsheet URL, sheet IDs, template version, display-name mappings, and target allocation settings. Full backup exports include these fields; report-only exports should omit `_config`, `_imports`, and raw profile metadata by default.
+
 ## Data Model
 
 Use a shared model across natural language, JSON, YAML, CSV, Excel import, and analysis flows:
@@ -117,6 +150,20 @@ Use a shared model across natural language, JSON, YAML, CSV, Excel import, and a
 - `WritePreview`: proposed writes, conflicts, original values, normalized values, target cells, explanations, and unresolved items.
 
 Default unit is 万元. If users omit a unit, treat values as 万元. If users explicitly use 元, 千元, or 万元, normalize to 万元 and show both original and normalized values in the preview.
+
+The implementation must create canonical schemas before writing production scripts. JSON Schema is preferred because it can validate JSON input without TypeScript compilation. Reference docs should also include TypeScript-like interfaces and golden examples.
+
+Minimum schema rules:
+
+- Month keys use `YYYY-MM`.
+- Numeric ledger values are decimal numbers in 万元 after normalization.
+- Store normalized values with at most four decimal places unless a field explicitly needs more precision.
+- Preserve `null` as "unknown/not provided" and `0` as an explicit zero.
+- Allow negative values only where semantically valid, such as refunds, reversals, asset losses, or liability reductions, and require an explanation note.
+- Keep currency separate from unit. Default currency is the user's ledger currency, initially CNY. Non-CNY values require an exchange-rate assumption in the input or preview.
+- Use stable enum keys for standard fields and separate them from user-facing display labels.
+- Map "other" numeric fields to their paired explanation fields, so extra context is not lost.
+- Standardize validation errors with code, message, field path, severity, and suggested fix.
 
 ## Monthly Update Flow
 
@@ -135,6 +182,31 @@ The main skill follows this flow:
 Natural language parsing is model-assisted but transparent. Clear fields map directly. Common items may be classified heuristically: year-end bonus and tax refunds as other income, vehicle insurance and property fees as special expenses, mortgage principal and long-term account deposits as asset conversions, and RSU or asset depreciation as asset changes. Ambiguous items go to `unresolved_items` and are not written until clarified.
 
 Structured input is supported for batch import. JSON is the core zero-extra-dependency path. CSV, YAML, and XLSX import are optional enhancements that may require npm packages.
+
+## Write Safety Protocol
+
+Every write must be based on a concrete preview. A preview contains:
+
+- `preview_id`, generated from a stable hash of profile ID, spreadsheet token, target ranges, normalized snapshot data, original cell values, and timestamp.
+- `read_revision` or the closest revision-like metadata returned by `lark-cli sheets +read`.
+- Original cell values for every numeric and explanation target.
+- Target ranges and values.
+- Conflict decisions explicitly approved by the user.
+
+Immediately before writing, the skill must re-read every target cell and compare it with the preview's original values. If any value changed, the write is rejected as stale and a fresh preview is required. This protects against concurrent manual edits and stale chat confirmations.
+
+Writes should be grouped by contiguous ranges where possible, but correctness is more important than fewer API calls. After each write group, re-read the written range and verify that the expected values are present. If a later group fails, do not pretend rollback succeeded unless a compensating write was actually verified. Instead, record a partial failure record in `_imports` or a dedicated operation log with:
+
+- Operation ID and preview ID.
+- Started/finished timestamps.
+- Target profile, year, month, and ranges.
+- Status: `planned`, `confirmed`, `writing`, `verified`, `partial_failed`, `failed`, or `stale_rejected`.
+- Per-range write and verification result.
+- Human-readable recovery instructions.
+
+If recording the failure to Feishu also fails, write a local recovery record next to the local profile and tell the user the exact path. The next run must surface unresolved local recovery records before attempting additional writes to the same ledger.
+
+Single-month updates and batch imports both use this protocol. Batch imports should write month by month so a partial failure can be isolated. Retrying a failed operation must compare the current cells against the failed operation's verified state and produce a new preview.
 
 ## Conflict Policy
 
@@ -158,7 +230,9 @@ All analysis sub-skills are read-only and should not write analysis results back
 
 `family-finance-planning` outputs future cash-flow planning, budgeting, rebalancing, debt payoff, risk scenarios, and annual path recommendations. It may give simple, diversified, low-complexity examples: cash and short-duration instruments for defense, broad index ETFs such as VOO or QQQ for Beta examples, and no specific stock picks for Alpha. Alpha guidance should focus on position limits, concentration, discipline, and risk budget.
 
-Default analysis uses only ledger data. If users ask for current market context, the planning skill may look up public market data and must cite source, date, and assumptions. Market data is not written into the ledger unless the user explicitly asks.
+Default analysis uses only ledger data. If users ask for current market context, the planning skill may look up public market data and must cite source, date, and assumptions. Analysis sub-skills must not write market data or assumptions into the ledger. If the user explicitly asks to save a market assumption, route that write through the main `family-finance` skill and its preview/confirmation protocol.
+
+Planning output must include advice boundaries. The skill can provide educational analysis, scenario planning, and low-complexity examples, but it must not present recommendations as personalized regulated financial advice. It should ask for risk tolerance, time horizon, liquidity needs, tax jurisdiction, and currency assumptions when those materially affect the answer. It must refuse or redirect requests for specific Alpha-layer individual stock buy/sell calls and instead discuss concentration limits, review discipline, and risk budgets.
 
 ## Lark CLI Dependency
 
@@ -171,6 +245,15 @@ The suite depends on `lark-cli` for Feishu spreadsheet operations. The main skil
 Missing permissions should be handled with least-privilege guidance, such as asking the user to run an appropriate `lark-cli auth login --scope ...` command. Do not request broad scopes up front.
 
 Core flows should require only Node.js built-ins plus `lark-cli`. Optional enhancements may prompt for npm dependencies only when invoked.
+
+The install contract should be explicit in `SKILL.md` and `references/lark-cli-workflows.md`:
+
+- Require a maintained Node.js runtime; Node.js 20+ is the recommended baseline unless testing proves a lower version works.
+- Require `lark-cli` to be on `PATH`; if missing, point users to the official `lark-cli` installation and AI Agent quick-start documentation.
+- Require `lark-cli` version 1.0.39 or newer unless compatibility testing expands the range.
+- Require user identity for personal Feishu ledger access; bot identity is not the default path.
+- Verify that sub-skills can locate the main skill by relative suite layout after `npx skills` installation. If this is not reliable, sub-skills must instruct Codex to locate the installed `family-finance` skill by name and read its references/assets from that folder.
+- Optional npm dependencies must be detected at runtime by feature, not installed silently. Error messages should name the feature, missing package, and a safe install command.
 
 ## Reminder Flow
 
@@ -201,6 +284,19 @@ Implementation should validate:
 8. Explanation fields append as expected.
 9. Sub-skills are read-only.
 10. Skill validation passes for all four skill folders.
+
+Additional end-to-end tests should cover:
+
+- Recovery from Feishu `_config` when the local profile is missing.
+- Missing, renamed, duplicated, or manually edited system sheets.
+- Template and manifest version mismatch.
+- Annual rollover through `+copy-sheet` and through manifest reconstruction.
+- Stale preview rejection after a manual cell edit.
+- Partial write failure and operation-log recovery guidance.
+- Permission-denied responses for read, write, create, and export flows.
+- Optional dependency missing paths for CSV, YAML, and XLSX import.
+- Full backup export privacy review and report-only export omitting system metadata.
+- Market-data lookup paths with source/date citation when planning requests current data.
 
 ## Initial Implementation Order
 
