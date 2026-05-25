@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Health Check"
+  short_description: "Review monthly family finance health"
+  default_prompt: "Use -finance-health-check to review this month's family finance health."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Planning"
+  short_description: "Plan budgets, allocation, and scenarios"
+  default_prompt: "Use -finance-planning to plan my family finances."
