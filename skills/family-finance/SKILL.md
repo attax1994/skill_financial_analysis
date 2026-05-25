@@ -1,85 +1,78 @@
 ---
 name: family-finance
-description: [TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it.]
+description: Use when creating, updating, importing, exporting, recovering, or maintaining a Feishu-based family finance ledger from monthly summary data; when users provide income, expense, asset conversion, asset/debt, or monthly review data and need write previews, confirmations, Excel backups, or recurring family finance check-ins.
 ---
 
 # Family Finance
 
 ## Overview
 
-[TODO: 1-2 sentences explaining what this skill enables]
+Maintain a long-running family finance ledger in Feishu Sheets from monthly summary data. Use the local template and manifest in this skill as the source of truth; never rely on the original online template after installation.
 
-## Structuring This Skill
+This main skill owns all stateful and write-capable workflows. The analysis sub-skills are read-only:
 
-[TODO: Choose the structure that best fits this skill's purpose. Common patterns:
+- `family-finance-health-check`: monthly financial health.
+- `family-finance-structure-analysis`: asset/debt/allocation structure.
+- `family-finance-planning`: budgets, scenarios, allocation and debt planning.
 
-**1. Workflow-Based** (best for sequential processes)
-- Works well when there are clear step-by-step procedures
-- Example: DOCX skill with "Workflow Decision Tree" -> "Reading" -> "Creating" -> "Editing"
-- Structure: ## Overview -> ## Workflow Decision Tree -> ## Step 1 -> ## Step 2...
+## First Steps
 
-**2. Task-Based** (best for tool collections)
-- Works well when the skill offers different operations/capabilities
-- Example: PDF skill with "Quick Start" -> "Merge PDFs" -> "Split PDFs" -> "Extract Text"
-- Structure: ## Overview -> ## Quick Start -> ## Task Category 1 -> ## Task Category 2...
+1. Run `scripts/check-env.mjs` or equivalent checks before Feishu operations.
+2. Confirm `lark-cli >= 1.0.39` and user identity are available.
+3. Load local profile if present; otherwise recover from the ledger's `_config` sheet when the user provides a Feishu URL.
+4. Read only until the user explicitly asks to create, update, import, export, or set reminders.
 
-**3. Reference/Guidelines** (best for standards or specifications)
-- Works well for brand guidelines, coding standards, or requirements
-- Example: Brand styling with "Brand Guidelines" -> "Colors" -> "Typography" -> "Features"
-- Structure: ## Overview -> ## Guidelines -> ## Specifications -> ## Usage...
+Read references as needed:
 
-**4. Capabilities-Based** (best for integrated systems)
-- Works well when the skill provides multiple interrelated features
-- Example: Product Management with "Core Capabilities" -> numbered capability list
-- Structure: ## Overview -> ## Core Capabilities -> ### 1. Feature -> ### 2. Feature...
+- `references/data-model.md`: canonical profile, snapshot, and preview schemas.
+- `references/manifest.md`: template manifest and reconstruction rules.
+- `references/lark-cli-workflows.md`: Feishu commands, permissions, and write safety.
+- `references/template-policy.md`: local template privacy and generalization rules.
 
-Patterns can be mixed and matched as needed. Most skills combine patterns (e.g., start with task-based, add workflow for complex operations).
+## Monthly Update Workflow
 
-Delete this entire "Structuring This Skill" section when done - it's just guidance.]
+Use this flow for requests like "更新 2026 年 5 月家庭财务" or "这个月工资 5.8，弹性支出 1.5":
 
-## [TODO: Replace with the first main section based on chosen structure]
+1. Parse the user's monthly summary into a `MonthlySnapshot`.
+2. Normalize amounts to 万元. If no unit is provided, assume 万元.
+3. Validate the snapshot with `scripts/validate-snapshot.mjs`.
+4. Read existing target cells from Feishu.
+5. Build a `WritePreview` with `scripts/build-write-preview.mjs`.
+6. Show the preview: target month, fields, cells, original values, write values, conflicts, note appends, unresolved items.
+7. Stop and ask for explicit confirmation before any write.
+8. Immediately before writing, re-read target cells and reject stale previews if anything changed.
+9. Write with `lark-cli sheets +write`, verify written ranges, and log partial failures.
 
-[TODO: Add content here. See examples in existing skills:
-- Code samples for technical skills
-- Decision trees for complex workflows
-- Concrete examples with realistic user requests
-- References to scripts/templates/references as needed]
+Never silently overwrite existing numeric values. Explanation fields may append by default, but the final text must still be shown in the preview.
 
-## Resources (optional)
+## Create Or Recover Ledger
 
-Create only the resource directories this skill actually needs. Delete this section if no resources are required.
+For a new user ledger:
 
-### scripts/
-Executable code (Python/Bash/etc.) that can be run directly to perform specific operations.
+1. Use `assets/family-finance-template.xlsx` and `assets/family-finance-template.manifest.json`.
+2. Prefer creating seed sheets and annual sheets from manifest-driven Feishu commands.
+3. Create visible system sheets: `_config`, `_snapshots`, `_imports`, `_template_cashflow`, `_template_balance`.
+4. Store only non-secret profile metadata in `_config`.
 
-**Examples from other skills:**
-- PDF skill: `fill_fillable_fields.py`, `extract_form_field_info.py` - utilities for PDF manipulation
-- DOCX skill: `document.py`, `utilities.py` - Python modules for document processing
+If local config is lost, ask the user for the Feishu spreadsheet URL, read `_config`, and rebuild the local profile. Do not store Feishu access tokens, refresh tokens, app secrets, cookies, or keychain material.
 
-**Appropriate for:** Python scripts, shell scripts, or any executable code that performs automation, data processing, or specific operations.
+## Import And Export
 
-**Note:** Scripts may be executed without loading into context, but can still be read by Codex for patching or environment adjustments.
+For historical migration, accept JSON first. CSV/YAML/XLSX import is optional and may require extra npm dependencies; detect those only when the user requests that feature.
 
-### references/
-Documentation and reference material intended to be loaded into context to inform Codex's process and thinking.
+For Excel output:
 
-**Examples from other skills:**
-- Product management: `communication.md`, `context_building.md` - detailed workflow guides
-- BigQuery: API reference documentation and query examples
-- Finance: Schema documentation, company policies
+- Full backup: use `lark-cli sheets +export` for the complete spreadsheet.
+- Report-only: omit or de-emphasize `_config`, `_imports`, and other system metadata. Treat this as an optional enhanced flow unless the environment already has the needed dependencies.
 
-**Appropriate for:** In-depth documentation, API references, database schemas, comprehensive guides, or any detailed information that Codex should reference while working.
+## Reminder Flow
 
-### assets/
-Files not intended to be loaded into context, but rather used within the output Codex produces.
+The skill may help create a monthly reminder when the environment supports automations and the user explicitly asks. Reminders only prompt the user to provide monthly data; they must not write financial data automatically.
 
-**Examples from other skills:**
-- Brand styling: PowerPoint template files (.pptx), logo files
-- Frontend builder: HTML/React boilerplate project directories
-- Typography: Font files (.ttf, .woff2)
+## Safety Rules
 
-**Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
-
----
-
-**Not every skill requires all three types of resources.**
+- Treat financial data as private.
+- Do not write to Feishu without a preview and explicit confirmation.
+- Do not rely on stale previews; re-read target cells before writing.
+- Do not write analysis results back to the ledger unless routed through this main skill and confirmed.
+- Do not give specific Alpha-layer individual stock buy/sell recommendations; planning examples may use broad, diversified Beta-layer instruments only as examples.
