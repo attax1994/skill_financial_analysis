@@ -1,0 +1,597 @@
+{
+  "schema_version": "1.0.0",
+  "template_version": "1.0.0",
+  "unit_policy": {
+    "default_unit": "wan",
+    "default_currency": "CNY",
+    "precision": 4
+  },
+  "annual_sheet_naming": {
+    "cashflow": "{year}现金流",
+    "balance": "{year}资产负债"
+  },
+  "sheets": {
+    "config": {
+      "title": "_config",
+      "role": "profile_config"
+    },
+    "snapshots": {
+      "title": "_snapshots",
+      "role": "balance_snapshots"
+    },
+    "imports": {
+      "title": "_imports",
+      "role": "operation_log"
+    },
+    "cashflow_template": {
+      "title": "_template_cashflow",
+      "role": "cashflow_seed",
+      "frozen_row_count": 1,
+      "frozen_column_count": 1
+    },
+    "balance_template": {
+      "title": "_template_balance",
+      "role": "balance_seed",
+      "frozen_row_count": 1,
+      "frozen_column_count": 0
+    }
+  },
+  "month_rows": {
+    "01": 3,
+    "02": 4,
+    "03": 5,
+    "04": 6,
+    "05": 7,
+    "06": 8,
+    "07": 9,
+    "08": 10,
+    "09": 11,
+    "10": 12,
+    "11": 13,
+    "12": 14
+  },
+  "field_mappings": {
+    "cashflow": {
+      "income": {
+        "member_a_salary": {
+          "column": "B",
+          "kind": "number",
+          "label": "成员A工资"
+        },
+        "member_b_salary": {
+          "column": "C",
+          "kind": "number",
+          "label": "成员B工资"
+        },
+        "housing_fund": {
+          "column": "D",
+          "kind": "number",
+          "label": "公积金"
+        },
+        "other_income": {
+          "column": "E",
+          "kind": "number",
+          "label": "其他收入",
+          "note_field": "income_note"
+        },
+        "income_note": {
+          "column": "F",
+          "kind": "note",
+          "label": "收入说明"
+        }
+      },
+      "expense": {
+        "fixed_expense": {
+          "column": "H",
+          "kind": "number",
+          "label": "固定支出"
+        },
+        "flexible_expense": {
+          "column": "I",
+          "kind": "number",
+          "label": "弹性支出"
+        },
+        "special_expense": {
+          "column": "J",
+          "kind": "number",
+          "label": "特殊支出",
+          "note_field": "expense_note"
+        },
+        "expense_note": {
+          "column": "K",
+          "kind": "note",
+          "label": "支出说明"
+        }
+      },
+      "asset_conversion": {
+        "recurring_conversion": {
+          "column": "M",
+          "kind": "number",
+          "label": "定期转化"
+        },
+        "other_conversion": {
+          "column": "N",
+          "kind": "number",
+          "label": "其他转化",
+          "note_field": "asset_conversion_note"
+        },
+        "asset_conversion_note": {
+          "column": "O",
+          "kind": "note",
+          "label": "资产转化说明"
+        }
+      },
+      "asset_change": {
+        "equity_units": {
+          "column": "V",
+          "kind": "number",
+          "label": "公司股权/RSU数量",
+          "precision": 4
+        },
+        "equity_amount": {
+          "column": "W",
+          "kind": "formula",
+          "label": "公司股权/RSU金额"
+        },
+        "asset_income": {
+          "column": "X",
+          "kind": "number",
+          "label": "资产收入",
+          "note_field": "asset_change_note"
+        },
+        "asset_loss": {
+          "column": "Y",
+          "kind": "number",
+          "label": "资产减损",
+          "note_field": "asset_change_note"
+        },
+        "asset_change_note": {
+          "column": "Z",
+          "kind": "note",
+          "label": "资产收支说明"
+        }
+      }
+    }
+  },
+  "writable_ranges": {
+    "cashflow": [
+      "B3:F14",
+      "H3:K14",
+      "M3:O14",
+      "V3:Z14",
+      "T2",
+      "W2"
+    ],
+    "balance": [
+      "A2:C17",
+      "E2:I17",
+      "K2:M17"
+    ],
+    "config": [
+      "A1:Z200"
+    ],
+    "snapshots": [
+      "A1:Z500"
+    ],
+    "imports": [
+      "A1:Z500"
+    ]
+  },
+  "protected_ranges": {
+    "cashflow": [
+      "Q3:T18",
+      "W3:AC18"
+    ],
+    "balance": [
+      "B18:M19",
+      "H2:H17"
+    ]
+  },
+  "renderable_templates": {
+    "cashflow": {
+      "sheet_title": "_template_cashflow",
+      "dimensions": {
+        "row_count": 201,
+        "column_count": 49
+      },
+      "frozen_row_count": 1,
+      "frozen_column_count": 1,
+      "values": [
+        [
+          null,
+          "成员A工资",
+          "成员B工资",
+          "公积金",
+          "其他收入",
+          "收入说明",
+          null,
+          "固定支出",
+          "弹性支出",
+          "特殊支出",
+          "支出说明",
+          null,
+          "定期转化",
+          "其他转化",
+          "资产转化说明",
+          null,
+          "本行收支",
+          "累计收支",
+          "本行现金流",
+          "剩余现金",
+          null,
+          "公司股权/RSU数量",
+          "公司股权/RSU金额",
+          "资产收入",
+          "资产减损",
+          "资产收支说明",
+          null,
+          "本行资产变化",
+          "累计资产变化"
+        ],
+        [
+          "起始",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "RSU计价",
+          null
+        ],
+        [
+          "1月"
+        ],
+        [
+          "2月"
+        ],
+        [
+          "3月"
+        ],
+        [
+          "4月"
+        ],
+        [
+          "5月"
+        ],
+        [
+          "6月"
+        ],
+        [
+          "7月"
+        ],
+        [
+          "8月"
+        ],
+        [
+          "9月"
+        ],
+        [
+          "10月"
+        ],
+        [
+          "11月"
+        ],
+        [
+          "12月"
+        ],
+        [],
+        [
+          "收入小记",
+          "=SUM(B3:B14)",
+          "=SUM(C3:C14)",
+          "=SUM(D3:D14)",
+          "=SUM(E3:E14)",
+          null,
+          "支出小记",
+          "=SUM(H3:H14)",
+          "=SUM(I3:I14)",
+          "=SUM(J3:J14)",
+          null,
+          "资产转化小计",
+          "=SUM(M3:M14)",
+          "=SUM(N3:N14)",
+          null,
+          "收支结余",
+          "=B16-H16",
+          null,
+          null,
+          null,
+          "资产小记",
+          "=SUM(V3:V14)",
+          "=SUM(W3:W14)",
+          "=SUM(X3:X14)",
+          "=SUM(Y3:Y14)"
+        ],
+        [
+          "收入总计",
+          "=SUM(B16:E16)",
+          null,
+          null,
+          null,
+          null,
+          "支出总计",
+          "=SUM(H16:J16)",
+          null,
+          null,
+          null,
+          "资产转化总计",
+          "=M16+N16",
+          null,
+          null,
+          "现金结余",
+          "=Q16-M17",
+          null,
+          null,
+          null,
+          "资产收支总计",
+          "=W16+X16-Y16",
+          null,
+          null,
+          null,
+          null,
+          "资产变化总计",
+          "=Q16+V17"
+        ],
+        [
+          "收入说明",
+          "记录工资、公积金、奖金、退税等收入。非周期收入写入其他收入并补充说明。",
+          null,
+          null,
+          null,
+          null,
+          "支出说明",
+          "固定支出记录房贷、租金、保险等稳定支出；弹性支出记录生活消费；特殊支出记录非周期大额事项。",
+          null,
+          null,
+          null,
+          "资产转化说明",
+          "记录现金转为资产、还贷款本金、长期账户入金等不改变净资产但影响现金流的事项。",
+          null,
+          null,
+          "结余说明",
+          "建议保留覆盖 6-12 个月必要支出的现金安全垫。",
+          null,
+          null,
+          null,
+          "资产收支说明",
+          "记录公司股权、资产收入、资产减损、固定资产折旧等不一定经过现金账户的资产变化。"
+        ]
+      ],
+      "merges": [],
+      "styles": [
+        {
+          "range": "A1:AC1",
+          "style": {
+            "font": {
+              "bold": true
+            },
+            "backColor": "#E8F3FF"
+          }
+        }
+      ],
+      "dropdowns": []
+    },
+    "balance": {
+      "sheet_title": "_template_balance",
+      "dimensions": {
+        "row_count": 202,
+        "column_count": 21
+      },
+      "frozen_row_count": 1,
+      "frozen_column_count": 0,
+      "values": [
+        [
+          "债务项",
+          "利率",
+          "现值(万)",
+          null,
+          "流动资产项",
+          "成本(万)",
+          "现值(万)",
+          "占比",
+          "未来合理占比",
+          null,
+          "非流动资产项",
+          "成本(万)",
+          "现值(万)"
+        ],
+        [
+          "住房贷款",
+          null,
+          null,
+          null,
+          "防御层",
+          null,
+          null,
+          "=SUM(H3:H10)",
+          0.4,
+          null,
+          "房产",
+          null,
+          null
+        ],
+        [
+          "消费贷/备用贷款",
+          null,
+          null,
+          null,
+          "现金及短债",
+          null,
+          null,
+          "=DIVIDE(G3,G18)",
+          0.05,
+          null,
+          "车位/其他不动产",
+          null,
+          null
+        ],
+        [
+          "车贷",
+          null,
+          null,
+          null,
+          "公积金账户",
+          null,
+          null,
+          "=DIVIDE(G4,G18)",
+          null,
+          null,
+          "车辆资产",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "实物黄金",
+          null,
+          null,
+          "=DIVIDE(G5,G18)",
+          0.15,
+          null,
+          "个人养老金账户A",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "贷款备还金",
+          null,
+          null,
+          "=DIVIDE(G6,G18)",
+          0.2,
+          null,
+          "个人养老金账户B",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "Beta层",
+          null,
+          null,
+          "=SUM(H12:H14)",
+          0.4
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "宽基基金账户",
+          null,
+          null,
+          "=DIVIDE(G12,G18)",
+          0.28
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "海外指数账户",
+          null,
+          null,
+          "=DIVIDE(G13,G18)"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "Alpha层",
+          null,
+          null,
+          "=SUM(H16:H17)",
+          0.2
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "个股/主动账户",
+          null,
+          null,
+          "=DIVIDE(G16,G18)",
+          0.2
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "公司股权/RSU",
+          null,
+          null,
+          "=DIVIDE(G17,G18)"
+        ],
+        [
+          "负债总计",
+          "=SUM(C2:C17)",
+          null,
+          null,
+          "流动资产总计",
+          "=SUM(F3:F17)",
+          "=SUM(G3:G17)",
+          null,
+          null,
+          null,
+          "固定资产总计",
+          "=SUM(L2:L17)",
+          "=SUM(M2:M17)"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "净资产",
+          "=-B18+G18+M18"
+        ]
+      ],
+      "merges": [],
+      "styles": [
+        {
+          "range": "A1:M1",
+          "style": {
+            "font": {
+              "bold": true
+            },
+            "backColor": "#E8F3FF"
+          }
+        }
+      ],
+      "dropdowns": []
+    }
+  }
+}
