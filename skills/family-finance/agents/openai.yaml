@@ -1,4 +1,4 @@
 interface:
   display_name: "Family Finance"
   short_description: "Maintain and analyze a family finance ledger"
-  default_prompt: "Use -finance to update my monthly family finance ledger."
+  default_prompt: "Use $family-finance to update my monthly family finance ledger."

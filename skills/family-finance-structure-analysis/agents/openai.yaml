@@ -1,4 +1,4 @@
 interface:
   display_name: "Family Finance Structure"
   short_description: "Analyze assets, debts, and allocation"
-  default_prompt: "Use -finance-structure-analysis to analyze my asset and debt structure."
+  default_prompt: "Use $family-finance-structure-analysis to analyze my asset and debt structure."

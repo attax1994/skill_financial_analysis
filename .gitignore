@@ -1,4 +1,5 @@
 # Local family-finance runtime state
+.DS_Store
 .family-finance/
 .family-finance-profiles/
 .family-finance-recovery/

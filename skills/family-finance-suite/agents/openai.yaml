@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Suite"
+  short_description: "Route family finance ledger and analysis tasks"
+  default_prompt: "Use $family-finance-suite to decide how to update, review, or plan my family finances."
