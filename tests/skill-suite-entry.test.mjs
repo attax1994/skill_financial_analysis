@@ -34,6 +34,23 @@ test('suite entry skill routes to every family finance skill', () => {
   assert.match(body, /confirmation/i);
 });
 
+test('repository root is installable as the suite entry skill', () => {
+  const body = read('SKILL.md');
+  const yaml = read('agents/openai.yaml');
+
+  assert.match(body, /^---\nname: family-finance-suite\n/m);
+  assert.match(body, /description: Use when /);
+  assert.match(body, /tools expect a SKILL\.md at the repository root/i);
+  assert.match(body, /skills\/family-finance-suite\/SKILL\.md/);
+
+  for (const skillName of skillNames.slice(1)) {
+    assert.match(body, new RegExp(`\\\`${skillName}\\\``), `${skillName} should be discoverable from the root entry skill`);
+  }
+
+  assert.ok(yaml.includes('display_name: "Family Finance Suite"'));
+  assert.ok(yaml.includes('default_prompt: "Use $family-finance-suite'));
+});
+
 test('main finance skill starts Feishu work with environment initialization', () => {
   const body = read('skills/family-finance/SKILL.md');
 

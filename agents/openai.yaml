@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Suite"
+  short_description: "Entry point for family finance skills"
+  default_prompt: "Use $family-finance-suite to update, review, or plan my family finances."
