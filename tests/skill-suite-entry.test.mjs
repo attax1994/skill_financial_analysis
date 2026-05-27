@@ -4,6 +4,7 @@ import test from 'node:test';
 
 const skillNames = [
   'family-finance-suite',
+  'family-finance-environment',
   'family-finance',
   'family-finance-health-check',
   'family-finance-structure-analysis',
@@ -25,11 +26,22 @@ test('suite entry skill routes to every family finance skill', () => {
   }
 
   assert.match(body, /write-capable ledger/i);
+  assert.match(body, /environment/i);
   assert.match(body, /health/i);
   assert.match(body, /structure/i);
   assert.match(body, /planning/i);
   assert.match(body, /preview/i);
   assert.match(body, /confirmation/i);
+});
+
+test('main finance skill starts Feishu work with environment initialization', () => {
+  const body = read('skills/family-finance/SKILL.md');
+
+  assert.match(body, /family-finance-environment/);
+  assert.match(body, /scripts\/check-env\.sh/);
+  assert.match(body, /scripts\/check-env\.mjs/);
+  assert.match(body, /Node\.js 20/);
+  assert.match(body, /lark-cli >= 1\.0\.39/);
 });
 
 test('all family finance skill UI prompts invoke the actual skill names', () => {

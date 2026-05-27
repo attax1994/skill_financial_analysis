@@ -4,10 +4,15 @@ Use `lark-cli >= 1.0.39` with user identity for personal finance ledgers.
 
 ## Environment Check
 
+Start with the shell bootstrap because it can diagnose a missing Node.js runtime:
+
 ```bash
+sh skills/family-finance/scripts/check-env.sh
 node skills/family-finance/scripts/check-env.mjs
 lark-cli --version
 ```
+
+The ordinary runtime requirements are Node.js 20+, npm/npx, `lark-cli >= 1.0.39`, and Feishu user access to the target document. `zip` is only required for template regeneration; Python plus PyYAML is only required for developer skill validation.
 
 If `lark-cli` is missing, direct the user to install/configure it from the official Lark CLI quick-start. If user authorization is missing, ask for the minimum needed `lark-cli auth login --scope ...`; do not request broad permissions up front.
 

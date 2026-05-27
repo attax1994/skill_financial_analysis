@@ -1,6 +1,6 @@
 ---
 name: family-finance-suite
-description: Use when users ask for family finance help without naming a specific sub-skill, or when a request may involve ledger setup, monthly updates, import/export, health reviews, asset/debt structure analysis, or planning across the family-finance skill suite.
+description: Use when users ask for family finance help without naming a specific sub-skill, or when a request may involve environment setup, ledger setup, monthly updates, import/export, health reviews, asset/debt structure analysis, or planning across the family-finance skill suite.
 ---
 
 # Family Finance Suite
@@ -11,6 +11,7 @@ This is the entry point for the family finance skill suite. Use it to choose the
 
 ## Skill Map
 
+- `family-finance-environment`: environment setup, missing Node.js/npm/npx, `lark-cli` installation, Feishu auth, PATH, and first-run diagnostics.
 - `family-finance`: write-capable ledger lifecycle, Feishu setup/recovery, monthly updates, imports, exports, templates, local profile, write previews, and confirmations.
 - `family-finance-health-check`: read-only monthly or annual health reviews, cash-flow checks, savings rate, spending anomalies, and emergency-fund checks.
 - `family-finance-structure-analysis`: read-only asset/debt structure, defense/Beta/Alpha allocation, liquidity, leverage, concentration, and payoff priority analysis.
@@ -20,11 +21,12 @@ This is the entry point for the family finance skill suite. Use it to choose the
 
 Start with the user's intent:
 
-1. If the request creates, recovers, updates, imports, exports, or writes a ledger, load `family-finance` first.
-2. If the user asks "健康吗", "这个月怎么样", savings rate, unusual spending, or cash safety buffer, load `family-finance-health-check`.
-3. If the user asks whether assets, debts, liquidity, or allocation are reasonable, load `family-finance-structure-analysis`.
-4. If the user asks what to do next, annual goals, future scenarios, budget targets, rebalancing, debt payoff, or risk cases, load `family-finance-planning`.
-5. For mixed requests, run stateful `family-finance` work first, then hand off to the relevant read-only analysis skill.
+1. If the user reports missing Node.js, npm, npx, `lark-cli`, Feishu auth, PATH, installation, or first-run setup trouble, load `family-finance-environment`.
+2. If the request creates, recovers, updates, imports, exports, or writes a ledger, load `family-finance` first.
+3. If the user asks "健康吗", "这个月怎么样", savings rate, unusual spending, or cash safety buffer, load `family-finance-health-check`.
+4. If the user asks whether assets, debts, liquidity, or allocation are reasonable, load `family-finance-structure-analysis`.
+5. If the user asks what to do next, annual goals, future scenarios, budget targets, rebalancing, debt payoff, or risk cases, load `family-finance-planning`.
+6. For mixed requests, run environment setup first if needed, then stateful `family-finance` work, then the relevant read-only analysis skill.
 
 When in doubt, read only and ask one concise clarification before writing.
 
@@ -37,6 +39,7 @@ All sub-skills use the main `family-finance` skill as the source of truth for:
 - `references/lark-cli-workflows.md`: Feishu read/write/create/export commands and permission handling.
 - `references/template-policy.md`: local template privacy and generalization rules.
 - `assets/family-finance-template.xlsx` and `assets/family-finance-template.manifest.json`: local template assets.
+- `scripts/check-env.sh` and `scripts/check-env.mjs`: no-Node bootstrap and strict Node/lark-cli environment checks.
 
 Do not duplicate those resources into analysis skills. Load only the specific reference needed for the task.
 
@@ -44,7 +47,7 @@ Do not duplicate those resources into analysis skills. Load only the specific re
 
 Only `family-finance` may write to Feishu or local profile state. Every write requires:
 
-1. Environment check for `lark-cli`.
+1. Environment check for Node.js 20, npm/npx, and `lark-cli >= 1.0.39`.
 2. Current profile or `_config` recovery.
 3. Read of existing target cells.
 4. A preview showing ranges, original values, proposed values, conflicts, note appends, and unresolved items.

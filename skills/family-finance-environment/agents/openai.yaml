@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Environment"
+  short_description: "Initialize Node, lark-cli, and Feishu access"
+  default_prompt: "Use $family-finance-environment to diagnose my family finance skill runtime setup."

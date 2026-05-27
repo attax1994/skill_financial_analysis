@@ -11,16 +11,19 @@ Maintain a long-running family finance ledger in Feishu Sheets from monthly summ
 
 This main skill owns all stateful and write-capable workflows. The analysis sub-skills are read-only:
 
+- `family-finance-environment`: first-run setup and dependency troubleshooting.
 - `family-finance-health-check`: monthly financial health.
 - `family-finance-structure-analysis`: asset/debt/allocation structure.
 - `family-finance-planning`: budgets, scenarios, allocation and debt planning.
 
 ## First Steps
 
-1. Run `scripts/check-env.mjs` or equivalent checks before Feishu operations.
-2. Confirm `lark-cli >= 1.0.39` and user identity are available.
-3. Load local profile if present; otherwise recover from the ledger's `_config` sheet when the user provides a Feishu URL.
-4. Read only until the user explicitly asks to create, update, import, export, or set reminders.
+1. If this is first run, installation, or the user reports missing Node.js/npm/npx/`lark-cli`, route to `family-finance-environment`.
+2. Run `scripts/check-env.sh` before Feishu operations; it works even when Node.js is missing.
+3. If Node.js 20 is available, run `scripts/check-env.mjs` for the strict JSON check.
+4. Confirm Node.js 20, npm/npx, `lark-cli >= 1.0.39`, and user identity are available.
+5. Load local profile if present; otherwise recover from the ledger's `_config` sheet when the user provides a Feishu URL.
+6. Read only until the user explicitly asks to create, update, import, export, or set reminders.
 
 Read references as needed:
 
