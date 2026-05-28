@@ -13,6 +13,11 @@ tmp/
 # Node dependencies
 node_modules/
 
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Worktree scratch space
 .worktrees/
 worktrees/
