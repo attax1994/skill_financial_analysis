@@ -1,6 +1,6 @@
 ---
 name: family-finance-suite
-description: Use when users need family finance ledger setup, environment initialization, monthly updates, import/export, Feishu spreadsheet operations, health checks, asset/debt structure analysis, or planning from the family-finance skill suite.
+description: Use when users need family finance feature guidance, ledger setup, environment initialization, monthly updates, import/export, Feishu spreadsheet operations, health checks, asset/debt structure analysis, or planning from the family-finance skill suite.
 ---
 
 # Family Finance Suite
@@ -13,13 +13,14 @@ The detailed suite router also exists at `skills/family-finance-suite/SKILL.md`.
 
 ## Route By Intent
 
+- `family-finance-onboarding`: beginner-friendly answers to "你能做什么", "有哪些功能", "怎么用", and what to try first.
 - `family-finance-environment`: missing Node.js/npm/npx/`lark-cli`, Feishu auth, PATH, installation, or first-run runtime diagnosis.
 - `family-finance`: write-capable ledger lifecycle, Feishu setup/recovery, monthly updates, imports, exports, templates, local profile, write previews, and confirmations.
 - `family-finance-health-check`: read-only health review, cash-flow check, savings rate, spending anomalies, and emergency-fund check.
 - `family-finance-structure-analysis`: read-only assets, debts, defense/Beta/Alpha allocation, liquidity, leverage, concentration, and payoff priority.
 - `family-finance-planning`: read-only budgets, future scenarios, rebalancing ranges, debt payoff planning, risk cases, and broad Beta-layer examples.
 
-For mixed requests, handle environment problems first, then stateful ledger work, then read-only analysis.
+For mixed requests, answer capability questions with `family-finance-onboarding` first, handle environment problems if needed, then stateful ledger work, then read-only analysis.
 
 ## Required Rule
 

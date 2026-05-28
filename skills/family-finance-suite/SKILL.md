@@ -1,6 +1,6 @@
 ---
 name: family-finance-suite
-description: Use when users ask for family finance help without naming a specific sub-skill, or when a request may involve environment setup, ledger setup, monthly updates, import/export, health reviews, asset/debt structure analysis, or planning across the family-finance skill suite.
+description: Use when users ask for family finance help without naming a specific sub-skill, ask what the skill can do, or when a request may involve environment setup, ledger setup, monthly updates, import/export, health reviews, asset/debt structure analysis, or planning across the family-finance skill suite.
 ---
 
 # Family Finance Suite
@@ -11,6 +11,7 @@ This is the entry point for the family finance skill suite. Use it to choose the
 
 ## Skill Map
 
+- `family-finance-onboarding`: beginner-friendly answers to "你能做什么", "有哪些功能", "怎么用", and what to try first.
 - `family-finance-environment`: environment setup, missing Node.js/npm/npx, `lark-cli` installation, Feishu auth, PATH, and first-run diagnostics.
 - `family-finance`: write-capable ledger lifecycle, Feishu setup/recovery, monthly updates, imports, exports, templates, local profile, write previews, and confirmations.
 - `family-finance-health-check`: read-only monthly or annual health reviews, cash-flow checks, savings rate, spending anomalies, and emergency-fund checks.
@@ -21,12 +22,13 @@ This is the entry point for the family finance skill suite. Use it to choose the
 
 Start with the user's intent:
 
-1. If the user reports missing Node.js, npm, npx, `lark-cli`, Feishu auth, PATH, installation, or first-run setup trouble, load `family-finance-environment`.
-2. If the request creates, recovers, updates, imports, exports, or writes a ledger, load `family-finance` first.
-3. If the user asks "健康吗", "这个月怎么样", savings rate, unusual spending, or cash safety buffer, load `family-finance-health-check`.
-4. If the user asks whether assets, debts, liquidity, or allocation are reasonable, load `family-finance-structure-analysis`.
-5. If the user asks what to do next, annual goals, future scenarios, budget targets, rebalancing, debt payoff, or risk cases, load `family-finance-planning`.
-6. For mixed requests, run environment setup first if needed, then stateful `family-finance` work, then the relevant read-only analysis skill.
+1. If the user asks "你能做什么", "有哪些功能", "怎么用", or whether it suits理财小白, load `family-finance-onboarding`.
+2. If the user reports missing Node.js, npm, npx, `lark-cli`, Feishu auth, PATH, installation, or first-run setup trouble, load `family-finance-environment`.
+3. If the request creates, recovers, updates, imports, exports, or writes a ledger, load `family-finance` first.
+4. If the user asks "健康吗", "这个月怎么样", savings rate, unusual spending, or cash safety buffer, load `family-finance-health-check`.
+5. If the user asks whether assets, debts, liquidity, or allocation are reasonable, load `family-finance-structure-analysis`.
+6. If the user asks what to do next, annual goals, future scenarios, budget targets, rebalancing, debt payoff, or risk cases, load `family-finance-planning`.
+7. For mixed requests, answer capability questions first, run environment setup if needed, then stateful `family-finance` work, then the relevant read-only analysis skill.
 
 When in doubt, read only and ask one concise clarification before writing.
 

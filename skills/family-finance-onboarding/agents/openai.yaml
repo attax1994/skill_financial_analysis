@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Onboarding"
+  short_description: "Explain features in beginner-friendly language"
+  default_prompt: "Use $family-finance-onboarding to explain what this family finance skill can do."
