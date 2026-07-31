@@ -27,6 +27,8 @@ Use this skill for:
 - Rebalancing ranges for defense/Beta/Alpha layers.
 - Risk scenarios such as income drop, large expense, market drawdown, or FX movement.
 
+For exact per-ticker buy amounts from a specific monthly contribution (目标金额法 / DCA active rebalancing), route to `family-finance-rebalance` instead of giving qualitative ranges here.
+
 ## Investment Advice Boundaries
 
 Provide educational planning and low-complexity examples, not regulated personalized financial advice.

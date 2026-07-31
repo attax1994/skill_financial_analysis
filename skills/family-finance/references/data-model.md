@@ -121,3 +121,71 @@ Use this shape:
   "suggested_fix": "Add expense_note."
 }
 ```
+
+## Rebalance Contracts
+
+Used by `family-finance-rebalance` and `scripts/plan-contribution.mjs`. These are standalone rebalance inputs, not ledger state: amounts stay in the user's own currency and are not normalized to 万元.
+
+### RebalanceTargets
+
+Persisted locally at `.family-finance-rebalance/rebalance-targets.json` (git-ignored scratch file).
+
+```json
+{
+  "currency": "USD",
+  "default_mode": "no_sell",
+  "targets": [
+    { "ticker": "VOO", "weight": 0.6 },
+    { "ticker": "QQQ", "weight": 0.4 }
+  ]
+}
+```
+
+### ContributionPlanRequest
+
+```json
+{
+  "currency": "USD",
+  "mode": "no_sell",
+  "contribution": 5000,
+  "holdings": [
+    { "ticker": "VOO", "value": 12000, "target_weight": 0.6 },
+    { "ticker": "QQQ", "value": 8000, "target_weight": 0.4 }
+  ]
+}
+```
+
+- `mode`: `no_sell` (default, buy-only) or `exact` (allow suggested sells).
+- `contribution`: run-time amount; never hard-coded.
+- `target_weight`: fractions summing to ~1 or percents summing to ~100.
+
+### ContributionPlanResult
+
+```json
+{
+  "ok": true,
+  "currency": "USD",
+  "mode": "no_sell",
+  "total_current_value": 20000,
+  "contribution": 5000,
+  "total_value_after": 25000,
+  "total_buy": 5000,
+  "flags": ["cannot_fully_rebalance"],
+  "items": [
+    {
+      "ticker": "VOO",
+      "current_value": 12000,
+      "current_weight": 0.6,
+      "target_weight": 0.6,
+      "target_value_after": 15000,
+      "gap": 3000,
+      "buy": 3000,
+      "value_after": 15000,
+      "weight_after": 0.6,
+      "action": "buy"
+    }
+  ]
+}
+```
+
+`Σbuy` always equals `contribution`; the rounding residual is folded into the largest buy.

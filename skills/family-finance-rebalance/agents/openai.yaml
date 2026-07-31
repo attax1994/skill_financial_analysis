@@ -1,0 +1,4 @@
+interface:
+  display_name: "Family Finance Rebalance"
+  short_description: "Plan monthly contributions with the target-amount method"
+  default_prompt: "Use $family-finance-rebalance to plan this month's contribution across my target weights."

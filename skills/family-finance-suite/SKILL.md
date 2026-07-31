@@ -17,6 +17,7 @@ This is the entry point for the family finance skill suite. Use it to choose the
 - `family-finance-health-check`: read-only monthly or annual health reviews, cash-flow checks, savings rate, spending anomalies, and emergency-fund checks.
 - `family-finance-structure-analysis`: read-only asset/debt structure, defense/Beta/Alpha allocation, liquidity, leverage, concentration, and payoff priority analysis.
 - `family-finance-planning`: read-only future planning, budgets, scenarios, rebalancing ranges, debt strategy, and broad Beta-layer examples.
+- `family-finance-rebalance`: read-only monthly-contribution planning by the target-amount method, computing per-ticker buy amounts toward target weights (定投 / DCA active rebalancing).
 
 ## Routing
 
@@ -27,8 +28,9 @@ Start with the user's intent:
 3. If the request creates, recovers, updates, imports, exports, or writes a ledger, load `family-finance` first.
 4. If the user asks "健康吗", "这个月怎么样", savings rate, unusual spending, or cash safety buffer, load `family-finance-health-check`.
 5. If the user asks whether assets, debts, liquidity, or allocation are reasonable, load `family-finance-structure-analysis`.
-6. If the user asks what to do next, annual goals, future scenarios, budget targets, rebalancing, debt payoff, or risk cases, load `family-finance-planning`.
-7. For mixed requests, answer capability questions first, run environment setup if needed, then stateful `family-finance` work, then the relevant read-only analysis skill.
+6. If the user asks what to do next, annual goals, future scenarios, budget targets, qualitative rebalancing ranges, debt payoff, or risk cases, load `family-finance-planning`.
+7. If the user runs a monthly/recurring contribution (定投 / DCA) and wants exact per-ticker buy amounts by the target-amount method, load `family-finance-rebalance`.
+8. For mixed requests, answer capability questions first, run environment setup if needed, then stateful `family-finance` work, then the relevant read-only analysis skill.
 
 When in doubt, read only and ask one concise clarification before writing.
 

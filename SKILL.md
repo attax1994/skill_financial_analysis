@@ -19,6 +19,7 @@ The detailed suite router also exists at `skills/family-finance-suite/SKILL.md`.
 - `family-finance-health-check`: read-only health review, cash-flow check, savings rate, spending anomalies, and emergency-fund check.
 - `family-finance-structure-analysis`: read-only assets, debts, defense/Beta/Alpha allocation, liquidity, leverage, concentration, and payoff priority.
 - `family-finance-planning`: read-only budgets, future scenarios, rebalancing ranges, debt payoff planning, risk cases, and broad Beta-layer examples.
+- `family-finance-rebalance`: read-only monthly-contribution planning by the target-amount method, reverse-solving per-ticker buy amounts toward target weights (定投 / DCA active rebalancing).
 
 For mixed requests, answer capability questions with `family-finance-onboarding` first, handle environment problems if needed, then stateful ledger work, then read-only analysis.
 

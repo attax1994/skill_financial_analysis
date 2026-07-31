@@ -9,7 +9,8 @@ const skillNames = [
   'family-finance',
   'family-finance-health-check',
   'family-finance-structure-analysis',
-  'family-finance-planning'
+  'family-finance-planning',
+  'family-finance-rebalance'
 ];
 
 function read(path) {

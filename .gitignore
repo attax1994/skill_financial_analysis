@@ -3,6 +3,7 @@
 .family-finance/
 .family-finance-profiles/
 .family-finance-recovery/
+.family-finance-rebalance/
 *.family-finance.local.json
 *.family-finance.recovery.json
 
