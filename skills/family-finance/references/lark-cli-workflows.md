@@ -1,10 +1,8 @@
 # Lark CLI Workflows
 
-Use `lark-cli >= 1.0.39` with user identity for personal finance ledgers.
+Use `lark-cli >= 1.0.61` with user identity for personal finance ledgers.
 
 ## Environment Check
-
-Start with the shell bootstrap because it can diagnose a missing Node.js runtime:
 
 ```bash
 sh skills/family-finance/scripts/check-env.sh
@@ -12,74 +10,70 @@ node skills/family-finance/scripts/check-env.mjs
 lark-cli --version
 ```
 
-The ordinary runtime requirements are Node.js 20+, npm/npx, `lark-cli >= 1.0.39`, and Feishu user access to the target document. `zip` is only required for template regeneration; Python plus PyYAML is only required for developer skill validation.
+The ordinary requirements are Node.js 20+, npm/npx, `lark-cli >= 1.0.61`, and Feishu user access. `zip` is required only for local template regeneration. Request only the minimum missing user scope.
 
-If `lark-cli` is missing, direct the user to install/configure it from the official Lark CLI quick-start. If user authorization is missing, ask for the minimum needed `lark-cli auth login --scope ...`; do not request broad permissions up front.
+## Read And Verify
 
-## Read Spreadsheet Metadata
-
-```bash
-lark-cli sheets +info --spreadsheet-token "<token>"
-```
-
-Use this before writes to resolve sheet IDs and verify expected system sheets.
-
-## Read Cells
+Resolve sheet IDs before sheet-level operations:
 
 ```bash
-lark-cli sheets +read --spreadsheet-token "<token>" --range "<sheetId>!A1:D10"
-lark-cli sheets +read --spreadsheet-token "<token>" --range "<sheetId>!A1:D10" --value-render-option Formula
+lark-cli sheets +workbook-info --url "<spreadsheet-or-wiki-url>"
 ```
 
-Use formula rendering when validating copied or reconstructed template sheets.
+Read pure values with `+csv-get`; include formulas when verifying a copied or reconstructed template:
+
+```bash
+lark-cli sheets +csv-get --url "<url>" --sheet-id "<sheetId>" --range "A1:AI18"
+lark-cli sheets +cells-get --url "<url>" --sheet-id "<sheetId>" --range "A1:AI18" --include value,formula
+```
 
 ## Create Ledger
 
-1. `lark-cli sheets +create --title "家庭财务账本"`
-2. Inspect the default sheet.
-3. Create or reuse visible system and seed sheets.
-4. Populate seed sheets from the manifest.
-5. Copy seed sheets for the first annual sheet group.
-6. Write `_config` only after sheet IDs are verified.
+1. Create a workbook with `+workbook-create`.
+2. Inspect its sheets with `+workbook-info`.
+3. Create or reuse visible system and seed sheets with `+sheet-create`.
+4. Populate seed sheets from the manifest using `+cells-set`.
+5. Apply `+dim-freeze`, `+cells-merge`, `+cells-set-style`, `+cols-resize`, and `+rows-resize` from manifest metadata.
+6. Copy verified seeds with `+sheet-copy` for the first annual group.
+7. Write `_config` only after sheet IDs are verified.
 
-Relevant commands:
+Representative commands:
 
 ```bash
-lark-cli sheets +create-sheet --spreadsheet-token "<token>" --title "_config"
-lark-cli sheets +copy-sheet --spreadsheet-token "<token>" --sheet-id "<seedId>" --title "2026现金流"
-lark-cli sheets +update-sheet --spreadsheet-token "<token>" --sheet-id "<sheetId>" --frozen-row-count 1 --frozen-col-count 1
-lark-cli sheets +merge-cells --spreadsheet-token "<token>" --range "<sheetId>!A1:B1"
-lark-cli sheets +set-style --spreadsheet-token "<token>" --range "<sheetId>!A1:Z1" --style '{"font":{"bold":true}}'
+lark-cli sheets +workbook-create --title "家庭财务账本"
+lark-cli sheets +sheet-create --url "<url>" --title "_config"
+lark-cli sheets +sheet-copy --url "<url>" --sheet-id "<seedId>" --title "2026现金流"
+lark-cli sheets +dim-freeze --url "<url>" --sheet-id "<sheetId>" --dimension row --count 1
+lark-cli sheets +cells-merge --url "<url>" --sheet-id "<sheetId>" --range "B1:B18"
+lark-cli sheets +cells-set-style --url "<url>" --sheet-id "<sheetId>" --range "A1:AI1" --font-weight bold
 ```
 
 ## Write Protocol
 
 Never write without a `WritePreview`.
 
-1. Build preview from current values.
-2. Show preview and ask for confirmation.
-3. Re-read all target ranges.
-4. Reject stale preview if any original value changed.
-5. Write grouped ranges with `lark-cli sheets +write`.
-6. Re-read written ranges and verify values.
+1. Build the preview from current values.
+2. Show target cells, original values, proposed values, note appends, and conflicts.
+3. Ask for explicit confirmation.
+4. Re-read every target cell and reject a stale preview.
+5. Write grouped ranges with `+cells-set`.
+6. Re-read and verify every written range.
 7. Log success or partial failure.
 
-Run Feishu write operations serially. Do not dispatch multiple `lark-cli sheets +write` calls in parallel; Feishu may return `90217 too many request`. If this happens, re-read target ranges, identify which ranges were actually written, wait briefly, then continue with a fresh preview or a carefully scoped compensating write.
+Run writes serially. If Feishu returns `90217 too many request`, re-read target ranges before retrying. Do not assume that a failed batch wrote nothing.
 
-Example write:
+Example shape:
 
 ```bash
-lark-cli sheets +write --spreadsheet-token "<token>" --range "<sheetId>!B7:F7" --values '[[5.8,2.7,0.5,0.8,"退税"]]'
+lark-cli sheets +cells-set --url "<url>" --sheet-id "<sheetId>" --range "D7:G7" --cells -
 ```
 
-If a failure cannot be logged to Feishu, write a local recovery record next to the local profile and surface it before future writes.
+Pass the JSON cell matrix through stdin. If a failure cannot be logged to Feishu, write a local recovery record next to the local profile and surface it before later writes.
 
 ## Export
 
-Full backup:
-
 ```bash
-lark-cli sheets +export --spreadsheet-token "<token>" --file-extension xlsx --output-path "./family-finance-backup.xlsx"
+lark-cli sheets +workbook-export --url "<url>" --file-extension xlsx --output-path "./family-finance-backup.xlsx"
 ```
 
-Report-only export is an enhanced flow: first export, then remove or filter system sheets if the environment has the needed optional tooling.
+Report-only export is an enhanced flow: export first, then remove or filter system sheets only when the environment already has the required tooling.

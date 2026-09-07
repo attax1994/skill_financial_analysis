@@ -1,6 +1,6 @@
 ---
 name: family-finance
-description: Use when creating, updating, importing, exporting, recovering, or maintaining a Feishu-based family finance ledger from monthly summary data; when users provide income, expense, asset conversion, asset/debt, or monthly review data and need write previews, confirmations, Excel backups, or recurring family finance check-ins.
+description: Use when creating, updating, importing, exporting, recovering, or maintaining a Feishu-based family finance ledger from monthly summary data; when users provide income, expense, asset conversion, asset redemption, asset/debt, or monthly review data and need write previews, confirmations, Excel backups, or recurring family finance check-ins.
 ---
 
 # Family Finance
@@ -21,9 +21,10 @@ This main skill owns all stateful and write-capable workflows. The analysis sub-
 1. If this is first run, installation, or the user reports missing Node.js/npm/npx/`lark-cli`, route to `family-finance-environment`.
 2. Run `scripts/check-env.sh` before Feishu operations; it works even when Node.js is missing.
 3. If Node.js 20 is available, run `scripts/check-env.mjs` for the strict JSON check.
-4. Confirm Node.js 20, npm/npx, `lark-cli >= 1.0.39`, and user identity are available.
+4. Confirm Node.js 20, npm/npx, `lark-cli >= 1.0.61`, and user identity are available.
 5. Load local profile if present; otherwise recover from the ledger's `_config` sheet when the user provides a Feishu URL.
-6. Read only until the user explicitly asks to create, update, import, export, or set reminders.
+6. Compare any stored `template_version` and `schema_version` with the active manifest. Stop for verification or migration on an explicit mismatch.
+7. Read only until the user explicitly asks to create, update, import, export, or set reminders.
 
 Read references as needed:
 
@@ -44,9 +45,17 @@ Use this flow for requests like "更新 2026 年 5 月家庭财务" or "这个�
 6. Show the preview: target month, fields, cells, original values, write values, conflicts, note appends, unresolved items.
 7. Stop and ask for explicit confirmation before any write.
 8. Immediately before writing, re-read target cells and reject stale previews if anything changed.
-9. Write with `lark-cli sheets +write`, verify written ranges, and log partial failures.
+9. Write with `lark-cli sheets +cells-set`, verify written ranges, and log partial failures.
 
 Never silently overwrite existing numeric values. Explanation fields may append by default, but the final text must still be shown in the preview.
+
+## V2 Cashflow Semantics
+
+Treat each annual cashflow sheet as a **滚动实际** view. It may start with a full-year projection, then each elapsed month is replaced with actual values. The latest updated month's cumulative cells describe actual progress; the full-year totals remain the current rolling view until all months are actual. Do not add budget-versus-actual comparison columns to this sheet. If the user later wants预算分析, create a 单独 budget sheet through a separately designed and confirmed workflow.
+
+The template intentionally omits 期初现金 and 期末现金 for privacy. Use `现金结余 = 收入 - 支出` to describe annual cash creation and `现金净增加额 = 现金结余 - 资产转化 + 资产赎回` to describe the net cash change after portfolio movements. Do not infer or write cash balances unless the user explicitly changes this privacy policy.
+
+Keep the simple household-finance labels. `资产转化` means cash moved into another asset or used to repay principal; `资产赎回` means an asset converted back into cash. Neither is income or spending, and neither directly changes net assets. Record non-cash additions such as housing-fund contributions under `asset_change.asset_income`, not cash income. Add new categories only after they exist and can be tracked reliably.
 
 ## Create Or Recover Ledger
 
@@ -65,7 +74,7 @@ For historical migration, accept JSON first. CSV/YAML/XLSX import is optional an
 
 For Excel output:
 
-- Full backup: use `lark-cli sheets +export` for the complete spreadsheet.
+- Full backup: use `lark-cli sheets +workbook-export` for the complete spreadsheet.
 - Report-only: omit or de-emphasize `_config`, `_imports`, and other system metadata. Treat this as an optional enhanced flow unless the environment already has the needed dependencies.
 
 ## Reminder Flow

@@ -36,7 +36,7 @@ The template intentionally leaves personal values blank, including RSU price, op
 
 Use the remote `A:M` layout as the semantic target: debts, liquid assets grouped by Defense/Beta/Alpha, non-current assets, current/target allocations, totals, and net assets. Retain generalized item labels from the local template. Expand the seed rows so each layer can represent the remote structure without copying personal product names.
 
-Target allocations remain configurable profile data. Template defaults stay generalized; they are not copied from the user's live workbook.
+Target allocations remain configurable profile data. Keep the generalized template default at `40% Defense / 40% Beta / 20% Alpha`; do not copy the live workbook's temporary `30% / 40% / 30%` plan into the reusable template.
 
 ## Schema And Automation Changes
 

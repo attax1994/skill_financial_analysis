@@ -2,7 +2,7 @@
 set -u
 
 MIN_NODE_MAJOR=20
-MIN_LARK_CLI="1.0.39"
+MIN_LARK_CLI="1.0.61"
 STATUS=0
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
@@ -75,6 +75,12 @@ if command -v zip >/dev/null 2>&1; then
   pass "zip available for template regeneration"
 else
   note "OPTIONAL: zip not found; ordinary ledger work is OK, template regeneration is blocked"
+fi
+
+if command -v unzip >/dev/null 2>&1; then
+  pass "unzip available for template verification"
+else
+  note "OPTIONAL: unzip not found; ordinary ledger work is OK, template verification is blocked"
 fi
 
 if command -v node >/dev/null 2>&1; then

@@ -5,7 +5,7 @@ export function buildExportCommand({ spreadsheetToken, outputPath, mode = 'full'
   const args = [
     'lark-cli',
     'sheets',
-    '+export',
+    '+workbook-export',
     '--spreadsheet-token',
     shellQuote(spreadsheetToken),
     '--file-extension',

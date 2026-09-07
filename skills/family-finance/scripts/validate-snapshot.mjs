@@ -17,6 +17,7 @@ const NOTE_FIELDS_BY_SECTION = {
   income: ['income_note'],
   expense: ['expense_note'],
   asset_conversion: ['asset_conversion_note'],
+  asset_redemption: ['asset_redemption_note'],
   asset_change: ['asset_change_note']
 };
 

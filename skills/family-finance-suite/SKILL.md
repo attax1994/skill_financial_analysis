@@ -51,7 +51,7 @@ Do not duplicate those resources into analysis skills. Load only the specific re
 
 Only `family-finance` may write to Feishu or local profile state. Every write requires:
 
-1. Environment check for Node.js 20, npm/npx, and `lark-cli >= 1.0.39`.
+1. Environment check for Node.js 20, npm/npx, and `lark-cli >= 1.0.61`.
 2. Current profile or `_config` recovery.
 3. Read of existing target cells.
 4. A preview showing ranges, original values, proposed values, conflicts, note appends, and unresolved items.

@@ -38,6 +38,7 @@
 - [ ] Replace the cashflow renderable seed with the generalized `A:AI` v2 structure and formulas.
 - [ ] Add `asset_redemption` mappings and validation note handling.
 - [ ] Expand the generalized balance seed to the remote layout while retaining configurable/generic labels and targets.
+- [ ] Preserve the reusable template's default `40% Defense / 40% Beta / 20% Alpha`; treat the live workbook's `30% / 40% / 30%` as instance-specific.
 - [ ] Update writable/protected ranges, merged ranges, styles, and dimensions in the manifest.
 - [ ] Run manifest and validation tests until green.
 

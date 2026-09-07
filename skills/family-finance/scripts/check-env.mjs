@@ -3,7 +3,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
-const MIN_LARK_CLI = '1.0.39';
+const MIN_LARK_CLI = '1.0.61';
 
 export async function checkEnvironment() {
   const result = {

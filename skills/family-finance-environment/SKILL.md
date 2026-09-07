@@ -15,12 +15,12 @@ Runtime dependencies for ordinary ledger work:
 
 - Node.js 20 or newer: required for bundled `.mjs` scripts, `node:test`, and many `npx skills` install flows.
 - npm and npx: required for `npx skills` installation and normal npm-based CLI installation flows.
-- `lark-cli >= 1.0.39`: required for Feishu Sheets/Wiki read, write, export, and auth operations.
+- `lark-cli >= 1.0.61`: required for the current Feishu Sheets/Wiki read, write, export, and auth shortcuts.
 - Feishu access: the user identity must be able to read or write the target spreadsheet/wiki node.
 
 Development-only or optional dependencies:
 
-- `zip`: only needed to regenerate `assets/family-finance-template.xlsx` from the manifest.
+- `zip` and `unzip`: only needed to regenerate and verify `assets/family-finance-template.xlsx` from the manifest.
 - Python plus PyYAML: only needed for `skill-creator/scripts/quick_validate.py`, not for user ledger workflows.
 - Git: only needed for repository work or private-repo install fallback.
 - Extra npm packages: only for future optional CSV/YAML/XLSX import or report-only export filtering; do not install these silently.
@@ -58,5 +58,5 @@ If `lark-cli` is not installed, use the current Lark CLI quick-start path for in
 ## Fallbacks
 
 - If the user cannot install Node.js, do not run local `.mjs` scripts. Offer to continue with manual spreadsheet guidance, a hosted/agent environment that already has Node.js and `lark-cli`, or ask the user to switch to a machine where `npx skills` can run.
-- If only `zip` or PyYAML is missing, ordinary ledger usage can continue; only template regeneration or developer validation is blocked.
+- If only `zip`, `unzip`, or PyYAML is missing, ordinary ledger usage can continue; only template regeneration or developer validation is blocked.
 - If `lark-cli` works but Feishu permissions fail, keep the diagnosis at the missing scope or document permission level.

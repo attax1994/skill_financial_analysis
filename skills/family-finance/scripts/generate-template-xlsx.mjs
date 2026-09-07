@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { execFile } from 'node:child_process';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readdir, rename, rm, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
@@ -33,26 +33,41 @@ const sheets = [
   },
   {
     name: manifest.renderable_templates.cashflow.sheet_title,
-    values: manifest.renderable_templates.cashflow.values,
-    frozenRowCount: manifest.renderable_templates.cashflow.frozen_row_count,
-    frozenColumnCount: manifest.renderable_templates.cashflow.frozen_column_count
+    ...templateSheetOptions(manifest.renderable_templates.cashflow)
   },
   {
     name: manifest.renderable_templates.balance.sheet_title,
-    values: manifest.renderable_templates.balance.values,
-    frozenRowCount: manifest.renderable_templates.balance.frozen_row_count,
-    frozenColumnCount: manifest.renderable_templates.balance.frozen_column_count
+    ...templateSheetOptions(manifest.renderable_templates.balance)
   }
 ];
 
+function templateSheetOptions(template) {
+  return {
+    values: template.values,
+    frozenRowCount: template.frozen_row_count,
+    frozenColumnCount: template.frozen_column_count,
+    defaultRowHeight: template.default_row_height,
+    columnWidths: template.column_widths,
+    merges: template.merges,
+    styles: template.styles
+  };
+}
+
 export async function generateTemplateXlsx(target = outputPath) {
-  const dir = await mkdtemp(join(tmpdir(), 'family-finance-xlsx-'));
+  const finalTarget = resolve(target);
+  const packageDir = await mkdtemp(join(tmpdir(), 'family-finance-xlsx-'));
+  await mkdir(dirname(finalTarget), { recursive: true });
+  const outputDir = await mkdtemp(join(dirname(finalTarget), '.family-finance-output-'));
+  const stagedTarget = join(outputDir, basename(finalTarget));
   try {
-    await createPackage(dir);
-    await execFileAsync('zip', ['-qr', target, '.'], { cwd: dir });
-    return target;
+    await createPackage(packageDir);
+    await normalizePackageTimestamps(packageDir);
+    await execFileAsync('zip', ['-Xqr', stagedTarget, '.'], { cwd: packageDir });
+    await rename(stagedTarget, finalTarget);
+    return finalTarget;
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(packageDir, { recursive: true, force: true });
+    await rm(outputDir, { recursive: true, force: true });
   }
 }
 
@@ -126,18 +141,62 @@ function worksheetXml(sheet) {
   const maxColumnCount = rows.reduce((max, row) => Math.max(max, row.length), 1);
   const dimension = `A1:${columnName(maxColumnCount)}${Math.max(rows.length, 1)}`;
   const rowXml = rows.map((row, rowIndex) => {
-    const cells = row.map((value, columnIndex) => cellXml(value, columnIndex + 1, rowIndex + 1)).join('');
+    const cells = Array.from({ length: maxColumnCount }, (_, columnIndex) => {
+      const rowNumber = rowIndex + 1;
+      const columnNumber = columnIndex + 1;
+      return cellXml(row[columnIndex], columnNumber, rowNumber, styleIndexForCell(sheet, columnNumber, rowNumber));
+    }).join('');
     return `<row r="${rowIndex + 1}">${cells}</row>`;
   }).join('');
   const sheetViews = sheetViewsXml(sheet);
+  const columns = columnsXml(sheet.columnWidths ?? []);
+  const merges = mergesXml(sheet.merges ?? []);
+  const defaultRowHeight = sheet.defaultRowHeight === undefined
+    ? 18
+    : excelRowHeight(sheet.defaultRowHeight);
 
   return xml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <dimension ref="${dimension}"/>
   ${sheetViews}
-  <sheetFormatPr defaultRowHeight="18"/>
+  <sheetFormatPr defaultRowHeight="${defaultRowHeight}"/>
+  ${columns}
   <sheetData>${rowXml}</sheetData>
+  ${merges}
 </worksheet>`);
+}
+
+function columnsXml(columnWidths) {
+  if (!columnWidths.length) return '';
+  const columns = columnWidths.map(({ range, width }) => {
+    const match = /^([A-Z]+):([A-Z]+)$/.exec(range);
+    if (!match) throw new Error(`Invalid column width range: ${range}`);
+    return `<col min="${columnNumber(match[1])}" max="${columnNumber(match[2])}" width="${excelColumnWidth(width)}" customWidth="1"/>`;
+  }).join('');
+  return `<cols>${columns}</cols>`;
+}
+
+function excelColumnWidth(pixelWidth) {
+  return Math.round(Math.max((pixelWidth - 5) / 7, 1) * 100) / 100;
+}
+
+function excelRowHeight(pixelHeight) {
+  return Math.round(pixelHeight * 0.75 * 100) / 100;
+}
+
+async function normalizePackageTimestamps(root) {
+  const timestamp = new Date('2000-01-01T00:00:00.000Z');
+  const entries = await readdir(root, { withFileTypes: true });
+  for (const entry of entries) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory()) await normalizePackageTimestamps(path);
+    await utimes(path, timestamp, timestamp);
+  }
+}
+
+function mergesXml(merges) {
+  if (!merges.length) return '';
+  return `<mergeCells count="${merges.length}">${merges.map((range) => `<mergeCell ref="${range}"/>`).join('')}</mergeCells>`;
 }
 
 function sheetViewsXml(sheet) {
@@ -156,10 +215,12 @@ function sheetViewsXml(sheet) {
   return `<sheetViews><sheetView workbookViewId="0"><pane ${attrs}/></sheetView></sheetViews>`;
 }
 
-function cellXml(value, column, row) {
-  if (value === null || value === undefined || value === '') return '';
+function cellXml(value, column, row, styleIndex = 0) {
   const ref = `${columnName(column)}${row}`;
-  const style = row === 1 ? ' s="1"' : '';
+  const style = styleIndex ? ` s="${styleIndex}"` : '';
+  if (value === null || value === undefined || value === '') {
+    return style ? `<c r="${ref}"${style}/>` : '';
+  }
   if (typeof value === 'number') return `<c r="${ref}"${style}><v>${value}</v></c>`;
   if (typeof value === 'string' && value.startsWith('=')) {
     return `<c r="${ref}"${style}><f>${escapeXml(value.slice(1))}</f></c>`;
@@ -167,23 +228,52 @@ function cellXml(value, column, row) {
   return `<c r="${ref}" t="inlineStr"${style}><is><t>${escapeXml(String(value))}</t></is></c>`;
 }
 
+function styleIndexForCell(sheet, column, row) {
+  let highlighted = false;
+  let numberFormat = null;
+  for (const entry of sheet.styles ?? []) {
+    if (!cellIsInRange(column, row, entry.range)) continue;
+    if (entry.style?.font?.bold || entry.style?.backColor) highlighted = true;
+    if (entry.style?.numberFormat) numberFormat = entry.style.numberFormat;
+  }
+  if (highlighted && numberFormat === '0.00%') return 3;
+  if (highlighted && numberFormat === '0%') return 4;
+  if (numberFormat === '0.00%') return 2;
+  if (numberFormat === '0%') return 5;
+  if (highlighted) return 1;
+  return 0;
+}
+
+function cellIsInRange(column, row, range) {
+  const match = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/.exec(range);
+  if (!match) throw new Error(`Invalid style range: ${range}`);
+  return column >= columnNumber(match[1])
+    && column <= columnNumber(match[3])
+    && row >= Number(match[2])
+    && row <= Number(match[4]);
+}
+
 function stylesXml() {
   return xml(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <fonts count="2">
-    <font><sz val="11"/><name val="Arial"/></font>
-    <font><b/><sz val="11"/><name val="Arial"/></font>
+    <font><sz val="13"/><name val="Arial"/></font>
+    <font><b/><sz val="13"/><name val="Arial"/></font>
   </fonts>
   <fills count="3">
     <fill><patternFill patternType="none"/></fill>
     <fill><patternFill patternType="gray125"/></fill>
-    <fill><patternFill patternType="solid"><fgColor rgb="FFE8F3FF"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFE1EAFF"/><bgColor indexed="64"/></patternFill></fill>
   </fills>
   <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
   <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-  <cellXfs count="2">
+  <cellXfs count="6">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
     <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>
+    <xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+    <xf numFmtId="10" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyNumberFormat="1"/>
+    <xf numFmtId="9" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyNumberFormat="1"/>
+    <xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
   </cellXfs>
 </styleSheet>`);
 }
@@ -213,6 +303,10 @@ function columnName(index) {
     current = Math.floor((current - 1) / 26);
   }
   return name;
+}
+
+function columnNumber(name) {
+  return [...name].reduce((value, char) => value * 26 + char.charCodeAt(0) - 64, 0);
 }
 
 function escapeXml(value) {

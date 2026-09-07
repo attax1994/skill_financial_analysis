@@ -38,12 +38,12 @@ test('preview captures original values and marks numeric conflicts', () => {
       }
     },
     existingValues: {
-      'cash2026!B7': 5.1
+      'cash2026!D7': 5.1
     }
   });
 
   assert.ok(preview.preview_id);
-  assert.equal(preview.writes[0].range, 'cash2026!B7');
+  assert.equal(preview.writes[0].range, 'cash2026!D7');
   assert.equal(preview.writes[0].original_value, 5.1);
   assert.equal(preview.writes[0].conflict, true);
 });
@@ -61,12 +61,77 @@ test('preview appends explanation fields with newlines', () => {
       }
     },
     existingValues: {
-      'cash2026!F7': 'bonus'
+      'cash2026!G7': 'bonus'
     }
   });
 
   assert.equal(preview.writes[0].value, 'bonus\ntax refund');
   assert.equal(preview.writes[0].merge_strategy, 'append_note');
+});
+
+test('preview maps asset redemptions into the v2 cash-inflow block', () => {
+  const preview = buildWritePreview({
+    profile,
+    manifest,
+    snapshot: {
+      month: '2026-06',
+      cashflow: {
+        asset_redemption: {
+          recurring_redemption: 0.24,
+          other_redemption: 7,
+          asset_redemption_note: '公积金提取'
+        }
+      }
+    },
+    existingValues: {}
+  });
+
+  assert.deepEqual(
+    preview.writes.map(({ field_path, range }) => ({ field_path, range })),
+    [
+      { field_path: 'cashflow.asset_redemption.recurring_redemption', range: 'cash2026!AD8' },
+      { field_path: 'cashflow.asset_redemption.other_redemption', range: 'cash2026!AE8' },
+      { field_path: 'cashflow.asset_redemption.asset_redemption_note', range: 'cash2026!AF8' }
+    ]
+  );
+});
+
+test('preview does not silently map the v1 housing fund cash-income field', () => {
+  const preview = buildWritePreview({
+    profile,
+    manifest,
+    snapshot: {
+      month: '2026-06',
+      cashflow: {
+        income: {
+          housing_fund: 0.5
+        }
+      }
+    },
+    existingValues: {}
+  });
+
+  assert.equal(preview.writes[0].unresolved, true);
+  assert.equal(preview.writes[0].field_path, 'cashflow.income.housing_fund');
+  assert.equal(preview.status, 'needs_resolution');
+});
+
+test('preview rejects a profile pinned to an older template or schema', () => {
+  assert.throws(() => buildWritePreview({
+    profile: {
+      ...profile,
+      template_version: '1.0.0',
+      schema_version: '1.0.0'
+    },
+    manifest,
+    snapshot: {
+      month: '2026-06',
+      cashflow: {
+        income: { member_a_salary: 5.8 }
+      }
+    },
+    existingValues: {}
+  }), /Profile template version 1\.0\.0 does not match manifest 2\.0\.0/);
 });
 
 test('stale detection reports changed cells', () => {
@@ -82,14 +147,14 @@ test('stale detection reports changed cells', () => {
       }
     },
     existingValues: {
-      'cash2026!I7': null
+      'cash2026!J7': null
     }
   });
 
   const stale = detectStalePreview(preview, {
-    'cash2026!I7': 1.4
+    'cash2026!J7': 1.4
   });
 
   assert.equal(stale.ok, false);
-  assert.equal(stale.changed[0].range, 'cash2026!I7');
+  assert.equal(stale.changed[0].range, 'cash2026!J7');
 });

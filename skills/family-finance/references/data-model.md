@@ -19,7 +19,8 @@ Use these contracts across natural language parsing, JSON import, write previews
   "display_name": "家庭财务",
   "spreadsheet_token": "sht_xxx",
   "spreadsheet_url": "https://my.feishu.cn/sheets/sht_xxx",
-  "template_version": "1.0.0",
+  "template_version": "2.0.0",
+  "schema_version": "2.0.0",
   "unit": "wan",
   "currency": "CNY",
   "years": {
@@ -42,6 +43,8 @@ Use these contracts across natural language parsing, JSON import, write previews
 
 Profile data is private but not secret. It may store document identifiers and mappings; it must never store auth tokens, refresh tokens, app secrets, cookies, or keychain output.
 
+Before generating a write preview, compare any profile `template_version` and `schema_version` with the active manifest. Reject explicit mismatches and verify or migrate the ledger before writing; a v1 profile must never be written with v2 column mappings.
+
 ## MonthlySnapshot
 
 ```json
@@ -52,7 +55,6 @@ Profile data is private but not secret. It may store document identifiers and ma
     "income": {
       "member_a_salary": { "value": 58000, "unit": "yuan" },
       "member_b_salary": 2.7,
-      "housing_fund": 0.5,
       "other_income": 0.8,
       "income_note": "退税"
     },
@@ -67,16 +69,25 @@ Profile data is private but not secret. It may store document identifiers and ma
       "other_conversion": 2,
       "asset_conversion_note": "长期账户入金"
     },
+    "asset_redemption": {
+      "recurring_redemption": 0.24,
+      "other_redemption": 5,
+      "asset_redemption_note": "提取公积金"
+    },
     "asset_change": {
       "equity_units": 10,
-      "asset_income": 0,
+      "asset_income": 0.5,
       "asset_loss": 0.2,
-      "asset_change_note": "车辆折旧"
+      "asset_change_note": "公积金入账 0.5；车辆折旧 0.2"
     }
   },
   "unresolved_items": []
 }
 ```
+
+`income` only contains cash income. Employer benefits such as housing-fund contributions that increase assets without entering a cash account belong in `asset_change.asset_income`. `asset_conversion` records cash moved into assets or used to repay principal; `asset_redemption` records assets converted back into cash. Conversions and redemptions change cash composition but do not directly change net assets.
+
+Schema v2 no longer maps the v1 field `income.housing_fund`. Treat it as unresolved input with preview status `needs_resolution` and move the amount to `asset_change.asset_income` with an explanatory note; never silently write it into a cash-income column.
 
 ## WritePreview
 
@@ -107,6 +118,8 @@ Profile data is private but not secret. It may store document identifiers and ma
 ```
 
 Before writing, re-read all `range` values and compare them with `original_value`. If any changed, reject the preview as stale.
+
+`WritePreview.status` is `needs_resolution` when any field is unmapped, `needs_confirmation` when mapped numeric values conflict with existing cells, and `ready_for_confirmation` otherwise. Never execute a preview with unresolved fields.
 
 ## Validation Errors
 

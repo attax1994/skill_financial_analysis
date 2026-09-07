@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0.0",
-  "template_version": "1.0.0",
+  "schema_version": "2.0.0",
+  "template_version": "2.0.0",
   "unit_policy": {
     "default_unit": "wan",
     "default_currency": "CNY",
@@ -32,14 +32,11 @@
     "balance_template": {
       "title": "_template_balance",
       "role": "balance_seed",
-      "frozen_row_count": 1,
+      "frozen_row_count": 0,
       "frozen_column_count": 0
     }
   },
   "month_rows": {
-    "10": 12,
-    "11": 13,
-    "12": 14,
     "01": 3,
     "02": 4,
     "03": 5,
@@ -48,124 +45,142 @@
     "06": 8,
     "07": 9,
     "08": 10,
-    "09": 11
+    "09": 11,
+    "10": 12,
+    "11": 13,
+    "12": 14
   },
   "field_mappings": {
     "cashflow": {
       "income": {
         "member_a_salary": {
-          "column": "B",
+          "column": "D",
           "kind": "number",
           "label": "成员A工资"
         },
         "member_b_salary": {
-          "column": "C",
+          "column": "E",
           "kind": "number",
           "label": "成员B工资"
         },
-        "housing_fund": {
-          "column": "D",
-          "kind": "number",
-          "label": "公积金"
-        },
         "other_income": {
-          "column": "E",
+          "column": "F",
           "kind": "number",
           "label": "其他收入",
           "note_field": "income_note"
         },
         "income_note": {
-          "column": "F",
+          "column": "G",
           "kind": "note",
           "label": "收入说明"
         }
       },
       "expense": {
         "fixed_expense": {
-          "column": "H",
+          "column": "I",
           "kind": "number",
           "label": "固定支出"
         },
         "flexible_expense": {
-          "column": "I",
+          "column": "J",
           "kind": "number",
           "label": "弹性支出"
         },
         "special_expense": {
-          "column": "J",
+          "column": "K",
           "kind": "number",
           "label": "特殊支出",
           "note_field": "expense_note"
         },
         "expense_note": {
-          "column": "K",
+          "column": "L",
           "kind": "note",
           "label": "支出说明"
         }
       },
-      "asset_conversion": {
-        "recurring_conversion": {
-          "column": "M",
-          "kind": "number",
-          "label": "定期转化"
-        },
-        "other_conversion": {
-          "column": "N",
-          "kind": "number",
-          "label": "其他转化",
-          "note_field": "asset_conversion_note"
-        },
-        "asset_conversion_note": {
-          "column": "O",
-          "kind": "note",
-          "label": "资产转化说明"
-        }
-      },
       "asset_change": {
         "equity_units": {
-          "column": "V",
+          "column": "N",
           "kind": "number",
           "label": "公司股权/RSU数量",
           "precision": 4
         },
         "equity_amount": {
-          "column": "W",
+          "column": "O",
           "kind": "formula",
           "label": "公司股权/RSU金额"
         },
         "asset_income": {
-          "column": "X",
+          "column": "P",
           "kind": "number",
           "label": "资产收入",
           "note_field": "asset_change_note"
         },
         "asset_loss": {
-          "column": "Y",
+          "column": "Q",
           "kind": "number",
           "label": "资产减损",
           "note_field": "asset_change_note"
         },
         "asset_change_note": {
-          "column": "Z",
+          "column": "R",
           "kind": "note",
           "label": "资产收支说明"
+        }
+      },
+      "asset_conversion": {
+        "recurring_conversion": {
+          "column": "Z",
+          "kind": "number",
+          "label": "定期转化"
+        },
+        "other_conversion": {
+          "column": "AA",
+          "kind": "number",
+          "label": "其他转化",
+          "note_field": "asset_conversion_note"
+        },
+        "asset_conversion_note": {
+          "column": "AB",
+          "kind": "note",
+          "label": "资产转化说明"
+        }
+      },
+      "asset_redemption": {
+        "recurring_redemption": {
+          "column": "AD",
+          "kind": "number",
+          "label": "定期赎回"
+        },
+        "other_redemption": {
+          "column": "AE",
+          "kind": "number",
+          "label": "资产赎回",
+          "note_field": "asset_redemption_note"
+        },
+        "asset_redemption_note": {
+          "column": "AF",
+          "kind": "note",
+          "label": "资产赎回说明"
         }
       }
     }
   },
   "writable_ranges": {
     "cashflow": [
-      "B3:F14",
-      "H3:K14",
-      "M3:O14",
-      "V3:Z14",
-      "T2",
-      "W2"
+      "D3:G14",
+      "I3:L14",
+      "N3:N14",
+      "P3:R14",
+      "Z3:AB14",
+      "AD3:AF14",
+      "O2"
     ],
     "balance": [
-      "A2:C17",
-      "E2:I17",
-      "K2:M17"
+      "A2:C19",
+      "E2:G19",
+      "I2:I19",
+      "K2:M19"
     ],
     "config": [
       "A1:Z200"
@@ -179,12 +194,15 @@
   },
   "protected_ranges": {
     "cashflow": [
-      "Q3:T18",
-      "W3:AC18"
+      "O3:O14",
+      "T3:W14",
+      "AH3:AI14",
+      "C16:AI18"
     ],
     "balance": [
-      "C13:M14",
-      "H2:H17"
+      "A1:M1",
+      "H2:H19",
+      "A20:M21"
     ]
   },
   "renderable_templates": {
@@ -192,532 +210,124 @@
       "sheet_title": "_template_cashflow",
       "dimensions": {
         "row_count": 201,
-        "column_count": 49
+        "column_count": 35
       },
       "frozen_row_count": 1,
       "frozen_column_count": 1,
-      "values": [
-        [
-          null,
-          "成员A工资",
-          "成员B工资",
-          "公积金",
-          "其他收入",
-          "收入说明",
-          null,
-          "固定支出",
-          "弹性支出",
-          "特殊支出",
-          "支出说明",
-          null,
-          "定期转化",
-          "其他转化",
-          "资产转化说明",
-          null,
-          "本行收支",
-          "累计收支",
-          "本行现金流",
-          "剩余现金",
-          null,
-          "公司股权/RSU数量",
-          "公司股权/RSU金额",
-          "资产收入",
-          "资产减损",
-          "资产收支说明",
-          null,
-          "本行资产变化",
-          "累计资产变化"
-        ],
-        [
-          "起始",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "RSU计价",
-          null
-        ],
-        [
-          "1月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B3+C3+D3+E3-H3-I3-J3",
-          "=R2+Q3",
-          "=Q3-M3-N3",
-          "=T2+S3",
-          null,
-          null,
-          "=V3*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q3+W3+X3-Y3",
-          "=AC2+AB3"
-        ],
-        [
-          "2月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B4+C4+D4+E4-H4-I4-J4",
-          "=R3+Q4",
-          "=Q4-M4-N4",
-          "=T3+S4",
-          null,
-          null,
-          "=V4*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q4+W4+X4-Y4",
-          "=AC3+AB4"
-        ],
-        [
-          "3月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B5+C5+D5+E5-H5-I5-J5",
-          "=R4+Q5",
-          "=Q5-M5-N5",
-          "=T4+S5",
-          null,
-          null,
-          "=V5*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q5+W5+X5-Y5",
-          "=AC4+AB5"
-        ],
-        [
-          "4月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B6+C6+D6+E6-H6-I6-J6",
-          "=R5+Q6",
-          "=Q6-M6-N6",
-          "=T5+S6",
-          null,
-          null,
-          "=V6*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q6+W6+X6-Y6",
-          "=AC5+AB6"
-        ],
-        [
-          "5月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B7+C7+D7+E7-H7-I7-J7",
-          "=R6+Q7",
-          "=Q7-M7-N7",
-          "=T6+S7",
-          null,
-          null,
-          "=V7*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q7+W7+X7-Y7",
-          "=AC6+AB7"
-        ],
-        [
-          "6月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B8+C8+D8+E8-H8-I8-J8",
-          "=R7+Q8",
-          "=Q8-M8-N8",
-          "=T7+S8",
-          null,
-          null,
-          "=V8*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q8+W8+X8-Y8",
-          "=AC7+AB8"
-        ],
-        [
-          "7月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B9+C9+D9+E9-H9-I9-J9",
-          "=R8+Q9",
-          "=Q9-M9-N9",
-          "=T8+S9",
-          null,
-          null,
-          "=V9*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q9+W9+X9-Y9",
-          "=AC8+AB9"
-        ],
-        [
-          "8月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B10+C10+D10+E10-H10-I10-J10",
-          "=R9+Q10",
-          "=Q10-M10-N10",
-          "=T9+S10",
-          null,
-          null,
-          "=V10*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q10+W10+X10-Y10",
-          "=AC9+AB10"
-        ],
-        [
-          "9月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B11+C11+D11+E11-H11-I11-J11",
-          "=R10+Q11",
-          "=Q11-M11-N11",
-          "=T10+S11",
-          null,
-          null,
-          "=V11*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q11+W11+X11-Y11",
-          "=AC10+AB11"
-        ],
-        [
-          "10月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B12+C12+D12+E12-H12-I12-J12",
-          "=R11+Q12",
-          "=Q12-M12-N12",
-          "=T11+S12",
-          null,
-          null,
-          "=V12*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q12+W12+X12-Y12",
-          "=AC11+AB12"
-        ],
-        [
-          "11月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B13+C13+D13+E13-H13-I13-J13",
-          "=R12+Q13",
-          "=Q13-M13-N13",
-          "=T12+S13",
-          null,
-          null,
-          "=V13*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q13+W13+X13-Y13",
-          "=AC12+AB13"
-        ],
-        [
-          "12月",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "=B14+C14+D14+E14-H14-I14-J14",
-          "=R13+Q14",
-          "=Q14-M14-N14",
-          "=T13+S14",
-          null,
-          null,
-          "=V14*W2",
-          null,
-          null,
-          null,
-          null,
-          "=Q14+W14+X14-Y14",
-          "=AC13+AB14"
-        ],
-        [],
-        [
-          "收入小记",
-          "=SUM(B3:B14)",
-          "=SUM(C3:C14)",
-          "=SUM(D3:D14)",
-          "=SUM(E3:E14)",
-          null,
-          "支出小记",
-          "=SUM(H3:H14)",
-          "=SUM(I3:I14)",
-          "=SUM(J3:J14)",
-          null,
-          "资产转化小计",
-          "=SUM(M3:M14)",
-          "=SUM(N3:N14)",
-          null,
-          "收支结余",
-          "=SUM(Q3:Q14)",
-          null,
-          null,
-          null,
-          "资产小记",
-          "=SUM(V3:V14)",
-          "=SUM(W3:W14)",
-          "=SUM(X3:X14)",
-          "=SUM(Y3:Y14)"
-        ],
-        [
-          "收入总计",
-          "=SUM(B16:E16)",
-          null,
-          null,
-          null,
-          null,
-          "支出总计",
-          "=SUM(H16:J16)",
-          null,
-          null,
-          null,
-          "资产转化总计",
-          "=M16+N16",
-          null,
-          null,
-          "现金结余",
-          "=SUM(S3:S14)",
-          null,
-          null,
-          null,
-          "资产收支总计",
-          "=W16+X16-Y16",
-          null,
-          null,
-          null,
-          null,
-          "资产变化总计",
-          "=SUM(AB3:AB14)"
-        ],
-        [
-          "收入说明",
-          "记录工资、公积金、奖金、退税等收入。非周期收入写入其他收入并补充说明。",
-          null,
-          null,
-          null,
-          null,
-          "支出说明",
-          "固定支出记录房贷、租金、保险等稳定支出；弹性支出记录生活消费；特殊支出记录非周期大额事项。",
-          null,
-          null,
-          null,
-          "资产转化说明",
-          "记录现金转为资产、还贷款本金、长期账户入金等不改变净资产但影响现金流的事项。",
-          null,
-          null,
-          "结余说明",
-          "建议保留覆盖 6-12 个月必要支出的现金安全垫。",
-          null,
-          null,
-          null,
-          "资产收支说明",
-          "记录公司股权、资产收入、资产减损、固定资产折旧等不一定经过现金账户的资产变化。"
-        ]
+      "default_row_height": 27,
+      "column_widths": [
+        { "range": "A:A", "width": 40 },
+        { "range": "B:B", "width": 39 },
+        { "range": "C:C", "width": 61 },
+        { "range": "D:F", "width": 60 },
+        { "range": "G:G", "width": 149 },
+        { "range": "H:H", "width": 61 },
+        { "range": "I:K", "width": 60 },
+        { "range": "L:L", "width": 139 },
+        { "range": "M:M", "width": 87 },
+        { "range": "N:O", "width": 63 },
+        { "range": "P:Q", "width": 61 },
+        { "range": "R:R", "width": 100 },
+        { "range": "S:U", "width": 61 },
+        { "range": "V:W", "width": 87 },
+        { "range": "X:X", "width": 39 },
+        { "range": "Y:Y", "width": 87 },
+        { "range": "Z:AA", "width": 60 },
+        { "range": "AB:AC", "width": 132 },
+        { "range": "AD:AE", "width": 61 },
+        { "range": "AF:AF", "width": 112 },
+        { "range": "AG:AG", "width": 87 },
+        { "range": "AH:AI", "width": 74 }
       ],
-      "merges": [],
+      "values": [
+        [null, "资\n产\n收\n支\n表", null, "成员A工资", "成员B工资", "其他收入", "收入说明", null, "固定支出", "弹性支出", "特殊支出", "支出说明", null, "公司股权/RSU数量", "公司股权/RSU金额", "资产收入", "资产减损", "资产收支说明", null, "本行收支", "累计收支", "本行资产增量", "累计资产增量", "现\n金\n流\n表", null, "定期转化", "其他转化", "资产转化说明", null, "定期赎回", "资产赎回", "资产赎回说明", null, "本行现金流", "累计现金流"],
+        ["起始", null, null, null, null, null, null, null, null, null, null, null, null, "RSU计价", null],
+        ["1月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N3*O2", null, null, null, null, "=D3+E3+F3-I3-J3-K3", "=U2+T3", "=T3+O3+P3-Q3", "=W2+V3", null, null, null, null, null, null, null, null, null, null, "=T3-Z3-AA3+AD3+AE3", "=AI2+AH3"],
+        ["2月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N4*O2", null, null, null, null, "=D4+E4+F4-I4-J4-K4", "=U3+T4", "=T4+O4+P4-Q4", "=W3+V4", null, null, null, null, null, null, null, null, null, null, "=T4-Z4-AA4+AD4+AE4", "=AI3+AH4"],
+        ["3月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N5*O2", null, null, null, null, "=D5+E5+F5-I5-J5-K5", "=U4+T5", "=T5+O5+P5-Q5", "=W4+V5", null, null, null, null, null, null, null, null, null, null, "=T5-Z5-AA5+AD5+AE5", "=AI4+AH5"],
+        ["4月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N6*O2", null, null, null, null, "=D6+E6+F6-I6-J6-K6", "=U5+T6", "=T6+O6+P6-Q6", "=W5+V6", null, null, null, null, null, null, null, null, null, null, "=T6-Z6-AA6+AD6+AE6", "=AI5+AH6"],
+        ["5月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N7*O2", null, null, null, null, "=D7+E7+F7-I7-J7-K7", "=U6+T7", "=T7+O7+P7-Q7", "=W6+V7", null, null, null, null, null, null, null, null, null, null, "=T7-Z7-AA7+AD7+AE7", "=AI6+AH7"],
+        ["6月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N8*O2", null, null, null, null, "=D8+E8+F8-I8-J8-K8", "=U7+T8", "=T8+O8+P8-Q8", "=W7+V8", null, null, null, null, null, null, null, null, null, null, "=T8-Z8-AA8+AD8+AE8", "=AI7+AH8"],
+        ["7月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N9*O2", null, null, null, null, "=D9+E9+F9-I9-J9-K9", "=U8+T9", "=T9+O9+P9-Q9", "=W8+V9", null, null, null, null, null, null, null, null, null, null, "=T9-Z9-AA9+AD9+AE9", "=AI8+AH9"],
+        ["8月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N10*O2", null, null, null, null, "=D10+E10+F10-I10-J10-K10", "=U9+T10", "=T10+O10+P10-Q10", "=W9+V10", null, null, null, null, null, null, null, null, null, null, "=T10-Z10-AA10+AD10+AE10", "=AI9+AH10"],
+        ["9月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N11*O2", null, null, null, null, "=D11+E11+F11-I11-J11-K11", "=U10+T11", "=T11+O11+P11-Q11", "=W10+V11", null, null, null, null, null, null, null, null, null, null, "=T11-Z11-AA11+AD11+AE11", "=AI10+AH11"],
+        ["10月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N12*O2", null, null, null, null, "=D12+E12+F12-I12-J12-K12", "=U11+T12", "=T12+O12+P12-Q12", "=W11+V12", null, null, null, null, null, null, null, null, null, null, "=T12-Z12-AA12+AD12+AE12", "=AI11+AH12"],
+        ["11月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N13*O2", null, null, null, null, "=D13+E13+F13-I13-J13-K13", "=U12+T13", "=T13+O13+P13-Q13", "=W12+V13", null, null, null, null, null, null, null, null, null, null, "=T13-Z13-AA13+AD13+AE13", "=AI12+AH13"],
+        ["12月", null, null, null, null, null, null, null, null, null, null, null, null, null, "=N14*O2", null, null, null, null, "=D14+E14+F14-I14-J14-K14", "=U13+T14", "=T14+O14+P14-Q14", "=W13+V14", null, null, null, null, null, null, null, null, null, null, "=T14-Z14-AA14+AD14+AE14", "=AI13+AH14"],
+        [],
+        [null, null, "收入小记", "=SUM(D3:D14)", "=SUM(E3:E14)", "=SUM(F3:F14)", null, "支出小记", "=SUM(I3:I14)", "=SUM(J3:J14)", "=SUM(K3:K14)", null, "资产小记", "=SUM(N3:N14)", "=SUM(O3:O14)", "=SUM(P3:P14)", "=SUM(Q3:Q14)", null, "现金结余", "=D17-I17", null, null, null, null, "资产转化小计", "=SUM(Z3:Z14)", "=SUM(AA3:AA14)", null, "资产赎回小计", "=SUM(AD3:AD14)", "=SUM(AE3:AE14)", null, "现金净增加额", "=T16-Z17+AD17"],
+        [null, null, "收入总计", "=SUM(D16:F16)", null, null, null, "支出总计", "=SUM(I16:K16)", null, null, null, "资产收支总计", "=O16+P16-Q16", null, null, null, null, "资产结余", "=T16+N17", null, null, null, null, "资产转化总计", "=Z16+AA16", null, null, "资产赎回总计", "=AD16+AE16"],
+        [null, null, "收入说明", "主要记录工资等现金收入；奖金、退税等非周期收入记入“其他收入”并补充说明。", null, null, null, "支出说明", "固定支出记录房贷利息、租金、保险等稳定支出；弹性支出记录生活消费；特殊支出记录非周期大额事项。", null, null, null, "资产收支说明", "资产收入记录没有经过现金账户、直接增加资产的项目，例如住房公积金；公司股权/RSU单独列出。资产减损记录折旧或其他资产损失。", null, null, null, null, "结余说明", "现金结余为收入减支出；资产结余为现金结余加非现金资产净增加。", null, null, null, null, "资产转化说明", "记录现金转为其他资产或偿还债务本金的事项；这些事项影响现金流，但不直接改变净资产。", null, null, "资产赎回说明", "记录资产赎回或出售后转为现金的事项；这些事项影响现金流，但不直接改变净资产。", null, null, "说明", "为保护隐私，本表只展示现金净增加额，不记录期初或期末现金余额。"]
+      ],
+      "merges": [
+        "B1:B18",
+        "X1:X18",
+        "D17:F17",
+        "D18:G18",
+        "I17:K17",
+        "I18:L18",
+        "N17:Q17",
+        "N18:R18",
+        "T16:W16",
+        "T17:W17",
+        "T18:W18",
+        "Z17:AA17",
+        "Z18:AB18",
+        "AD17:AE17",
+        "AD18:AF18",
+        "AG16:AG17",
+        "AH16:AI17",
+        "AH18:AI18"
+      ],
       "styles": [
         {
-          "range": "A1:AC1",
+          "range": "A1:AI1",
           "style": {
-            "font": {
-              "bold": true
-            },
-            "backColor": "#E8F3FF"
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
           }
+        },
+        {
+          "range": "B1:B18",
+          "style": {
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
+          }
+        },
+        {
+          "range": "X1:X18",
+          "style": {
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
+          }
+        },
+        {
+          "range": "C16:C18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "H16:H18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "M16:M18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "S16:S18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "Y16:Y18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "AC16:AC18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "AG16:AG18",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
         }
       ],
       "dropdowns": []
@@ -725,206 +335,105 @@
     "balance": {
       "sheet_title": "_template_balance",
       "dimensions": {
-        "row_count": 202,
+        "row_count": 204,
         "column_count": 21
       },
-      "frozen_row_count": 1,
+      "frozen_row_count": 0,
       "frozen_column_count": 0,
+      "default_row_height": 27,
       "values": [
-        [
-          "债务项",
-          "利率",
-          "现值(万)",
-          null,
-          "流动资产项",
-          "成本(万)",
-          "现值(万)",
-          "占比",
-          "未来合理占比",
-          null,
-          "非流动资产项",
-          "成本(万)",
-          "现值(万)"
-        ],
-        [
-          "住房贷款",
-          null,
-          null,
-          null,
-          "防御层",
-          null,
-          null,
-          "=SUM(H3:H6)",
-          0.4,
-          null,
-          "房产",
-          null,
-          null
-        ],
-        [
-          "消费贷/备用贷款",
-          null,
-          null,
-          null,
-          "现金及短债",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G3,G13),0)",
-          0.05,
-          null,
-          "车位/其他不动产",
-          null,
-          null
-        ],
-        [
-          "车贷",
-          null,
-          null,
-          null,
-          "公积金账户",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G4,G13),0)",
-          null,
-          null,
-          "车辆资产",
-          null,
-          null
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "实物黄金",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G5,G13),0)",
-          0.15,
-          null,
-          "个人养老金账户A",
-          null,
-          null
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "贷款备还金",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G6,G13),0)",
-          0.2,
-          null,
-          "个人养老金账户B",
-          null,
-          null
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "Beta层",
-          null,
-          null,
-          "=SUM(H8:H9)",
-          0.4
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "宽基基金账户",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G8,G13),0)",
-          0.28
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "海外指数账户",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G9,G13),0)"
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "Alpha层",
-          null,
-          null,
-          "=SUM(H11:H12)",
-          0.2
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "个股/主动账户",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G11,G13),0)",
-          0.2
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          "公司股权/RSU",
-          null,
-          null,
-          "=IFERROR(DIVIDE(G12,G13),0)"
-        ],
-        [
-          "负债总计",
-          null,
-          "=SUM(C2:C12)",
-          null,
-          "流动资产总计",
-          "=SUM(F3:F12)",
-          "=SUM(G3:G12)",
-          null,
-          null,
-          null,
-          "固定资产总计",
-          "=SUM(L2:L12)",
-          "=SUM(M2:M12)"
-        ],
-        [
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "净资产",
-          "=-C13+G13+M13"
-        ]
+        ["债务项", "利率", "现值(万)", null, "流动资产项", "成本(万)", "现值(万)", "占比", "未来合理占比", null, "非流动资产项", "成本(万)", "现值(万)"],
+        ["住房贷款", null, null, null, "防御层", null, null, "=SUM(H3:H10)", 0.4, null, "房产", null, null],
+        ["消费贷/备用贷款", null, null, null, "现金", null, null, "=IFERROR(G3/G20,0)", "现金与公积金\n5%", null, "车位/其他不动产", null, null],
+        ["车贷", null, null, null, "公积金账户", null, null, "=IFERROR(G4/G20,0)", null, null, "车辆资产", null, null],
+        [null, null, null, null, "中短期债券", null, null, "=IFERROR(G5/G20,0)", "债券与定存\n20%"],
+        [null, null, null, null, "定期存款", null, null, "=IFERROR(G6/G20,0)"],
+        [null, null, null, null, "外币定存", null, null, "=IFERROR(G7/G20,0)"],
+        [null, null, null, null, "短期美债", null, null, "=IFERROR(G8/G20,0)"],
+        [null, null, null, null, "实物黄金", null, null, "=IFERROR(G9/G20,0)", "黄金\n15%"],
+        [null, null, null, null, "黄金积存", null, null, "=IFERROR(G10/G20,0)"],
+        [null, null, null, null, "Beta层", null, null, "=SUM(H12:H15)", 0.4],
+        [null, null, null, null, "境内宽基基金", null, null, "=IFERROR(G12/G20,0)", "宽基指数\n35%"],
+        [null, null, null, null, "海外指数账户", null, null, "=IFERROR(G13/G20,0)"],
+        [null, null, null, null, "个人养老金账户A", null, null, "=IFERROR(G14/G20,0)", "个人养老金\n5%"],
+        [null, null, null, null, "个人养老金账户B", null, null, "=IFERROR(G15/G20,0)"],
+        [null, null, null, null, "Alpha层", null, null, "=SUM(H17:H19)", 0.2],
+        [null, null, null, null, "个股/主动账户", null, null, "=IFERROR(G17/G20,0)", "主动投资\n20%"],
+        [null, null, null, null, "数字资产", null, null, "=IFERROR(G18/G20,0)"],
+        [null, null, null, null, "公司股权/RSU", null, null, "=IFERROR(G19/G20,0)"],
+        ["负债总计", "=SUM(C2:C19)", null, null, "流动资产总计", "=SUM(F3:F19)", "=SUM(G3:G19)", null, null, null, "固定资产总计", "=SUM(L2:L19)", "=SUM(M2:M19)"],
+        [null, null, null, null, null, null, null, null, null, null, "净资产", "=-B20+G20+M20"]
       ],
-      "merges": [],
+      "merges": [
+        "I3:I4",
+        "I5:I8",
+        "I9:I10",
+        "I12:I13",
+        "I14:I15",
+        "I17:I19",
+        "B20:C20",
+        "L21:M21"
+      ],
       "styles": [
         {
           "range": "A1:M1",
           "style": {
-            "font": {
-              "bold": true
-            },
-            "backColor": "#E8F3FF"
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
           }
+        },
+        {
+          "range": "E2:I2",
+          "style": {
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
+          }
+        },
+        {
+          "range": "E11:I11",
+          "style": {
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
+          }
+        },
+        {
+          "range": "E16:I16",
+          "style": {
+            "font": { "bold": true, "size": 13 },
+            "backColor": "#E1EAFF"
+          }
+        },
+        {
+          "range": "B2:B19",
+          "style": { "numberFormat": "0.00%" }
+        },
+        {
+          "range": "H2:H19",
+          "style": { "numberFormat": "0.00%" }
+        },
+        {
+          "range": "I2:I2",
+          "style": { "numberFormat": "0%" }
+        },
+        {
+          "range": "I11:I11",
+          "style": { "numberFormat": "0%" }
+        },
+        {
+          "range": "I16:I16",
+          "style": { "numberFormat": "0%" }
+        },
+        {
+          "range": "A20:A20",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "E20:E20",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
+        },
+        {
+          "range": "K20:K21",
+          "style": { "font": { "bold": true, "size": 13 }, "backColor": "#E1EAFF" }
         }
       ],
       "dropdowns": []

@@ -1,6 +1,6 @@
 # Template Policy
 
-The installed skill must be self-contained. The original Feishu template is a development source only.
+The installed skill must be self-contained. The remote workbook structure is a development source only; the local manifest and generated XLSX are the distributable source of truth.
 
 ## Local Assets
 
@@ -39,6 +39,7 @@ Use generic labels such as:
 ## Privacy Rules
 
 - Treat all user finance data as private.
+- Do not include 期初现金 or 期末现金 in the reusable cashflow template. This is an intentional 隐私 boundary; use annual cash surplus and net cash increase instead.
 - Do not store raw auth material anywhere.
 - Full backups include system metadata.
 - Report-only exports should omit `_config`, `_imports`, and raw profile metadata by default.

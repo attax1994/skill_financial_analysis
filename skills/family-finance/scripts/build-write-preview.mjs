@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 export function buildWritePreview({ profile, manifest, snapshot, existingValues = {}, readRevision = null }) {
+  assertCompatibleVersions(profile, manifest);
   const year = snapshot.month.slice(0, 4);
   const month = snapshot.month.slice(5, 7);
   const row = manifest.month_rows[month];
@@ -60,6 +61,7 @@ export function buildWritePreview({ profile, manifest, snapshot, existingValues 
     original_values: Object.fromEntries(writes.filter((write) => !write.unresolved).map((write) => [write.range, write.original_value])),
     targets: writes.map((write) => ({ range: write.range, value: write.value, conflict: write.conflict }))
   };
+  const unresolvedItems = writes.filter((write) => write.unresolved);
 
   return {
     preview_id: hashPreviewInput(previewInput),
@@ -68,9 +70,22 @@ export function buildWritePreview({ profile, manifest, snapshot, existingValues 
     spreadsheet_token: profile.spreadsheet_token,
     month: snapshot.month,
     writes,
-    unresolved_items: writes.filter((write) => write.unresolved),
-    status: writes.some((write) => write.conflict) ? 'needs_confirmation' : 'ready_for_confirmation'
+    unresolved_items: unresolvedItems,
+    status: unresolvedItems.length > 0
+      ? 'needs_resolution'
+      : writes.some((write) => write.conflict)
+        ? 'needs_confirmation'
+        : 'ready_for_confirmation'
   };
+}
+
+function assertCompatibleVersions(profile, manifest) {
+  if (profile.template_version && profile.template_version !== manifest.template_version) {
+    throw new Error(`Profile template version ${profile.template_version} does not match manifest ${manifest.template_version}; verify or migrate the ledger before writing.`);
+  }
+  if (profile.schema_version && profile.schema_version !== manifest.schema_version) {
+    throw new Error(`Profile schema version ${profile.schema_version} does not match manifest ${manifest.schema_version}; verify or migrate the ledger before writing.`);
+  }
 }
 
 export function detectStalePreview(preview, currentValues) {

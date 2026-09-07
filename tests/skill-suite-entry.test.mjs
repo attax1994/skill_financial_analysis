@@ -78,7 +78,35 @@ test('main finance skill starts Feishu work with environment initialization', ()
   assert.match(body, /scripts\/check-env\.sh/);
   assert.match(body, /scripts\/check-env\.mjs/);
   assert.match(body, /Node\.js 20/);
-  assert.match(body, /lark-cli >= 1\.0\.39/);
+  assert.match(body, /lark-cli >= 1\.0\.61/);
+});
+
+test('main finance skill documents the v2 rolling-actuals and privacy contract', () => {
+  const body = read('skills/family-finance/SKILL.md');
+
+  assert.match(body, /滚动实际/i);
+  assert.match(body, /期初现金.*期末现金.*privacy/s);
+  assert.match(body, /现金结余.*收入.*支出/s);
+  assert.match(body, /资产转化.*资产赎回/s);
+  assert.match(body, /预算.*单独.*sheet/i);
+  assert.match(body, /housing-fund.*asset_change\.asset_income/i);
+});
+
+test('family finance references describe v2 reconstruction and current lark-cli reads and writes', () => {
+  const manifestReference = read('skills/family-finance/references/manifest.md');
+  const templatePolicy = read('skills/family-finance/references/template-policy.md');
+  const workflows = read('skills/family-finance/references/lark-cli-workflows.md');
+
+  assert.match(manifestReference, /2\.0\.0/);
+  assert.match(manifestReference, /asset_redemption/);
+  assert.match(manifestReference, /D3:G14/);
+  assert.match(manifestReference, /AD3:AF14/);
+  assert.match(templatePolicy, /remote.*structure.*development source/i);
+  assert.match(templatePolicy, /期初.*期末.*现金.*隐私/s);
+  assert.match(workflows, /\+workbook-info/);
+  assert.match(workflows, /\+cells-get/);
+  assert.match(workflows, /\+cells-set/);
+  assert.doesNotMatch(workflows, /sheets \+read|sheets \+write/);
 });
 
 test('all family finance skill UI prompts invoke the actual skill names', () => {

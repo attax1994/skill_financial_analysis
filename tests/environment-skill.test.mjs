@@ -13,9 +13,10 @@ test('environment initialization skill documents runtime and development depende
   assert.match(body, /Node\.js 20/);
   assert.match(body, /npm/);
   assert.match(body, /npx/);
-  assert.match(body, /lark-cli >= 1\.0\.39/);
+  assert.match(body, /lark-cli >= 1\.0\.61/);
   assert.match(body, /Feishu/);
   assert.match(body, /zip/);
+  assert.match(body, /unzip/);
   assert.match(body, /PyYAML/);
   assert.match(body, /runtime/i);
   assert.match(body, /development/i);
@@ -29,7 +30,8 @@ test('no-node bootstrap checker exists and checks prerequisites before Node scri
   assert.match(body, /command -v npm/);
   assert.match(body, /command -v npx/);
   assert.match(body, /command -v lark-cli/);
-  assert.match(body, /1\.0\.39/);
+  assert.match(body, /command -v unzip/);
+  assert.match(body, /1\.0\.61/);
   assert.match(body, /Node\.js 20/);
   assert.match(body, /check-env\.mjs/);
 });

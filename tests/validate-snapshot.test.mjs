@@ -47,6 +47,38 @@ test('negative values require an explanation note', () => {
   assert.equal(result.errors[0].code, 'NEGATIVE_REQUIRES_NOTE');
 });
 
+test('asset redemption values normalize and use their own explanation note', () => {
+  const result = validateMonthlySnapshot({
+    month: '2026-06',
+    cashflow: {
+      asset_redemption: {
+        recurring_redemption: { value: 2400, unit: 'yuan' },
+        other_redemption: -1,
+        asset_redemption_note: '赎回冲正'
+      }
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.value.cashflow.asset_redemption.recurring_redemption, 0.24);
+  assert.equal(result.value.cashflow.asset_redemption.other_redemption, -1);
+});
+
+test('negative asset redemption requires an asset redemption note', () => {
+  const result = validateMonthlySnapshot({
+    month: '2026-06',
+    cashflow: {
+      asset_redemption: {
+        other_redemption: -1
+      }
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.errors[0].code, 'NEGATIVE_REQUIRES_NOTE');
+  assert.equal(result.errors[0].path, 'cashflow.asset_redemption.other_redemption');
+});
+
 test('month keys must use YYYY-MM', () => {
   const result = validateMonthlySnapshot({
     month: '2026-5',
